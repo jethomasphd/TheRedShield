@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE SPIRAL — A Work of Speculative Fiction</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--void:#030303;--parch:#0a0906;--frag:#0d0b08;--ember:#c9a227;--ember-dim:#8a6f1a;--ember-glow:#e6c044;--blood:#6b1a1a;--blood-b:#8b2020;--ash:#9c9484;--bone:#d4cbb8;--ink:#c2b8a2;--ink-f:#7a7264;--ink-g:#4a4538;--iron:#3a3632;--wax:#7a1a1a;--wax-light:#a82828}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#000;color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.75;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+
+/* === PROLOGUE === */
+#prologue{position:fixed;inset:0;background:var(--void);z-index:8000;display:flex;align-items:center;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#prologue::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(201,162,39,0.03) 0%,transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(107,26,26,0.04) 0%,transparent 50%);pointer-events:none}
+.folio{position:relative;z-index:2;max-width:620px;width:92%;margin:auto;padding:40px 30px;text-align:center}
+.folio-epigraph{font-size:16px;font-style:italic;color:var(--ink-f);line-height:2.2;margin-bottom:35px;opacity:0;animation:pf 2s .5s ease forwards}
+.folio-epigraph strong{color:var(--bone);font-weight:600;font-style:normal}
+.folio-epigraph em{color:var(--ember-dim)}
+.folio-line{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--iron),transparent);margin:25px auto;opacity:0;animation:pf 1.5s 1.8s ease forwards}
+.folio-stakes{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:3px;line-height:2.5;color:var(--ink-g);text-transform:uppercase;margin-bottom:30px;opacity:0;animation:pf 2s 2.2s ease forwards}
+.folio-title{font-family:'Cinzel',serif;font-size:28px;font-weight:400;letter-spacing:6px;color:var(--ember);margin-bottom:8px;opacity:0;animation:pf 2s 3s ease forwards;text-shadow:0 0 40px rgba(201,162,39,0.1)}
+.folio-sub{font-size:15px;font-style:italic;color:var(--ink-f);letter-spacing:2px;margin-bottom:30px;opacity:0;animation:pf 2s 3.4s ease forwards}
+.folio-fiction{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--blood-b);letter-spacing:2px;line-height:2;margin-bottom:30px;padding:14px;border:1px solid rgba(107,26,26,0.25);opacity:0;animation:pf 2s 3.8s ease forwards}
+.seal-btn{position:relative;display:inline-block;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--wax-light),var(--wax) 60%,#4a0e0e 100%);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.6),inset 0 2px 4px rgba(255,255,255,0.1),inset 0 -2px 6px rgba(0,0,0,0.3);opacity:0;animation:pf 2s 4.4s ease forwards;transition:transform .3s,box-shadow .3s}
+.seal-btn:hover{transform:scale(1.05);box-shadow:0 6px 30px rgba(122,26,26,0.4),inset 0 2px 4px rgba(255,255,255,0.1)}
+.seal-btn::before{content:'✦';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:22px;color:rgba(255,220,180,0.5);text-shadow:0 1px 2px rgba(0,0,0,0.5)}
+.seal-btn::after{content:'';position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(255,220,180,0.15)}
+.seal-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--ink-g);text-transform:uppercase;margin-top:15px;opacity:0;animation:pf 2s 4.8s ease forwards}
+@keyframes pf{to{opacity:1}}
+#prologue.breaking{animation:sbrk 1.8s ease forwards}
+@keyframes sbrk{0%{opacity:1}15%{filter:brightness(1.5)}40%{filter:brightness(2);opacity:.9}60%{filter:brightness(1);opacity:.6}100%{opacity:0;pointer-events:none}}
+
+/* === UI === */
+.fic-mark{position:fixed;top:12px;right:16px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;color:rgba(139,32,32,0.3);text-transform:uppercase;z-index:5000;writing-mode:vertical-rl;pointer-events:none;display:none}
+#prog-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--blood),var(--ember),var(--blood));width:0%;z-index:5001;transition:width .15s;display:none}
+#ch-ind{position:fixed;bottom:16px;left:16px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--ink-g);text-transform:uppercase;z-index:5000;opacity:0;transition:opacity .5s;display:none}
+
+/* === DOSSIER === */
+#dossier{display:none;background:var(--void);min-height:100vh;opacity:0;transition:opacity 2s}
+#dossier.vis{opacity:1}
+.sw{max-width:820px;margin:0 auto;padding:60px 40px 120px}
+
+/* === TYPOGRAPHY === */
+.cls{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--blood-b);text-align:center;padding:30px 0 10px}
+.cls-line{width:200px;height:1px;background:linear-gradient(90deg,transparent,var(--blood),transparent);margin:8px auto}
+.tb{text-align:center;padding:50px 0 40px;border-bottom:1px solid var(--iron);margin-bottom:50px}
+.tb h1{font-family:'Cinzel',serif;font-size:42px;font-weight:400;letter-spacing:8px;color:var(--ember);text-shadow:0 0 40px rgba(201,162,39,0.15);margin-bottom:10px}
+.tb .sub{font-style:italic;font-size:20px;color:var(--ink-f);letter-spacing:2px}
+.tb .cat{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-g);letter-spacing:3px;margin-top:20px;text-transform:uppercase}
+.ab{text-align:center;padding:90px 0 70px}
+.ab .an{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:8px;text-transform:uppercase;color:var(--blood-b);margin-bottom:10px}
+.ab .at{font-family:'Cinzel',serif;font-size:34px;font-weight:400;letter-spacing:6px;color:var(--ember);text-shadow:0 0 60px rgba(201,162,39,0.12)}
+.ab::before,.ab::after{content:'';display:block;width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--ember-dim),transparent);margin:25px auto}
+.ch{margin-bottom:60px}
+.chh{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--ember-dim);margin-bottom:15px;padding-bottom:8px;border-bottom:1px solid var(--iron);display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.chh .dt{font-style:italic;color:var(--ink-g);letter-spacing:2px}
+.ch h2{font-family:'Cinzel',serif;font-size:24px;font-weight:400;color:var(--bone);letter-spacing:3px;margin-bottom:20px}
+.ch h3{font-family:'Cinzel',serif;font-size:18px;font-weight:400;color:var(--ember);letter-spacing:2px;margin:30px 0 15px}
+.ch p{margin-bottom:16px;text-align:justify;hyphens:auto}
+.nt{text-align:center;padding:30px 20px;margin:10px 0 40px}
+.nt p{font-size:16px;font-style:italic;color:var(--ink-f);letter-spacing:1px;text-align:center;line-height:1.8}
+.an-note{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-g);border-left:2px solid var(--iron);padding:12px 20px;margin:25px 0;font-style:italic;background:rgba(201,162,39,0.02)}
+.pull{font-style:italic;color:var(--ember);font-size:20px;line-height:1.6;padding:25px 30px;margin:30px 0;text-align:center}
+.pull::before,.pull::after{content:'';display:block;width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--ember-dim),transparent);margin:0 auto 15px}
+.pull::after{margin:15px auto 0}
+.pull .attr{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-g);letter-spacing:3px;text-transform:uppercase;margin-top:12px;font-style:normal}
+.be{padding:20px;margin:30px 0;background:var(--frag);border:1px solid var(--iron)}
+.be::before{content:'[FRAGMENT — partial recovery from fire damage]';display:block;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--blood-b);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.sb{background:linear-gradient(180deg,var(--void),var(--frag),var(--void));padding:40px 30px;margin:40px -20px;border-top:1px solid var(--iron);border-bottom:1px solid var(--iron)}
+.sb p{font-size:16px;line-height:1.9;color:var(--ash)}
+.dv{text-align:center;padding:35px 0;color:var(--ember-dim);letter-spacing:15px;font-size:14px;opacity:0.5}
+
+/* === ARCHIVAL IMAGES === */
+.arch-img{position:relative;margin:35px 0;text-align:center}
+.arch-img img{max-width:100%;height:auto;border:1px solid var(--iron);filter:sepia(0.15) contrast(1.05);opacity:0.9;display:block;margin:0 auto}
+.arch-img .img-cap{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-g);letter-spacing:2px;text-transform:uppercase;margin-top:10px;text-align:center;line-height:1.8}
+.arch-img.portrait img{max-width:320px}
+.arch-img.document img{max-width:600px;filter:none;opacity:0.95}
+.arch-img.wide img{max-width:100%}
+.arrows-wrap{text-align:center;margin:30px 0 10px}
+.arrows-logo{display:inline-block;max-width:130px;opacity:0.65;filter:brightness(1.5) contrast(1.1)}
+.arrows-caption{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-g);letter-spacing:3px;text-transform:uppercase;margin-top:10px;text-align:center}
+
+/* === LEAFLET === */
+.lf-map{width:100%;max-width:760px;margin:40px auto 0;height:420px;border:1px solid var(--iron);position:relative;background:var(--void);z-index:1}
+.lf-cap{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-g);text-align:center;padding:12px;letter-spacing:2px;border:1px solid var(--iron);border-top:none;max-width:760px;margin:0 auto 30px;background:var(--frag)}
+.leaflet-popup-content-wrapper{background:var(--frag)!important;color:var(--bone)!important;border:1px solid var(--iron)!important;border-radius:2px!important;box-shadow:0 4px 20px rgba(0,0,0,.5)!important;font-family:'IBM Plex Mono',monospace!important;font-size:11px!important}
+.leaflet-popup-tip{background:var(--frag)!important}
+.leaflet-popup-content{margin:10px 14px!important;line-height:1.6}
+.leaflet-control-attribution{display:none!important}
+.leaflet-control-zoom{border:1px solid var(--iron)!important}
+.leaflet-control-zoom a{background:var(--frag)!important;color:var(--ember)!important;border-color:var(--iron)!important}
+
+/* === DOCUMENT FRAME (Balfour context) === */
+.doc-note{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-g);margin-top:12px;padding-top:12px;border-top:1px solid var(--iron);line-height:1.8;text-align:center}
+
+/* === DETECTIVE FILE === */
+.ev-card{position:relative;margin-bottom:20px;padding:24px;background:linear-gradient(135deg,rgba(13,11,8,.95),rgba(10,9,6,.98));border:1px solid var(--iron);border-left:3px solid var(--ember-dim);opacity:0;transform:translateX(-10px);transition:all .8s}
+.ev-card.show{opacity:1;transform:translateX(0)}
+.ev-card.spec{border-left-color:var(--blood-b)}
+.ev-card .ev-num{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--ink-g);margin-bottom:4px}
+.ev-card .ev-class{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;margin-bottom:10px}
+.ev-card .ev-class.fact{color:var(--ember);border:1px solid var(--ember-dim)}
+.ev-card .ev-class.alleged{color:var(--blood-b);border:1px solid var(--blood)}
+.ev-card .ev-body{font-size:16px;color:var(--ash);line-height:1.75}
+.ev-card .ev-body em{color:var(--bone)}
+.ev-narr{font-size:17px;font-style:italic;color:var(--ink-f);text-align:center;padding:15px 20px;margin:10px 0;opacity:0;transition:opacity .8s}
+.ev-narr.show{opacity:1}
+
+/* === VERTICAL TIMELINE === */
+.vtl{position:relative;margin:50px 0;padding:20px 0 20px 40px}
+.vtl::before{content:'';position:absolute;left:16px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--iron),var(--ember-dim),var(--ember),var(--ember-dim),var(--iron))}
+.vtl-node{position:relative;margin-bottom:30px;padding-left:30px;opacity:0;transform:translateY(10px);transition:opacity .6s,transform .6s}
+.vtl-node.on{opacity:1;transform:translateY(0)}
+.vtl-node::before{content:'';position:absolute;left:-32px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--iron);border:2px solid var(--frag);transition:all .5s;z-index:2}
+.vtl-node.on::before{background:var(--ember);box-shadow:0 0 12px rgba(201,162,39,.5)}
+.vtl-yr{font-family:'Cinzel',serif;font-size:16px;color:var(--ember);letter-spacing:3px;margin-bottom:2px}
+.vtl-ev{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ember-dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.vtl-desc{font-size:15px;color:var(--ash);line-height:1.7}
+
+/* === RUPTURE === */
+.rupture{position:relative;margin:80px 0}
+.rupture::before{content:'';position:absolute;top:0;left:-100vw;right:-100vw;bottom:0;background:linear-gradient(180deg,var(--void) 0%,rgba(92,16,16,.06) 20%,rgba(42,26,58,.04) 50%,rgba(92,16,16,.06) 80%,var(--void) 100%);z-index:-1}
+
+/* === THE QUESTION / SEAL / TERMINAL / FOOTER === */
+.tq{text-align:center;padding:80px 20px}
+.tq .qt{font-size:24px;font-style:italic;color:var(--ember);line-height:1.8;max-width:580px;margin:0 auto 50px}
+.tq .ans{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--ink-g);text-transform:uppercase;line-height:2.5}
+.action-box{margin:40px 0;padding:30px;border:1px solid var(--ember-dim);background:rgba(201,162,39,0.02)}
+.action-box h3{font-family:'Cinzel',serif;font-size:16px;color:var(--ember);letter-spacing:3px;margin-bottom:20px;text-align:center}
+.action-box p{font-size:15px;color:var(--ash);line-height:1.8;margin-bottom:12px}
+.action-box strong{color:var(--bone);font-weight:600}
+.seal{text-align:center;padding:40px 0}
+.seal-c{display:inline-block;width:110px;height:110px;border:2px solid var(--ember-dim);border-radius:50%;line-height:110px;font-family:'Cinzel',serif;font-size:14px;letter-spacing:3px;color:var(--ember);position:relative}
+.seal-c::before,.seal-c::after{content:'';position:absolute;border-radius:50%;border:1px solid var(--iron)}
+.seal-c::before{inset:6px}.seal-c::after{inset:-8px}
+.et{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-g);text-align:center;padding:50px 0;letter-spacing:2px;line-height:2.2}
+.ec{display:inline-block;width:8px;height:13px;background:var(--ember);animation:blink 1.2s step-end infinite;vertical-align:text-bottom;margin-left:3px}
+@keyframes blink{50%{opacity:0}}
+.footer{text-align:center;padding:40px 0 60px;border-top:1px solid var(--iron);margin-top:40px}
+.footer a{color:var(--ember-dim);text-decoration:none;transition:color .3s}
+.footer a:hover{color:var(--ember)}
+.footer .f-email{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-f);letter-spacing:2px}
+.footer .f-made{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-g);letter-spacing:2px;margin-top:8px}
+
+.rv{opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
+.rv.vis{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){.sw{padding:30px 20px 80px}.tb h1{font-size:28px;letter-spacing:4px}.ch h2{font-size:20px}.ab .at{font-size:24px}.tq .qt{font-size:20px}.pull{font-size:18px;padding:20px 15px}.lf-map{height:300px}.fic-mark{font-size:8px;right:8px}#ch-ind{font-size:8px;left:10px;bottom:10px}.folio{padding:30px 16px}.folio-epigraph{font-size:15px}.folio-title{font-size:22px;letter-spacing:4px}.vtl{padding-left:30px}.vtl::before{left:10px}.vtl-node{padding-left:22px}.vtl-node::before{left:-26px}.ev-card{padding:16px}.arch-img.portrait img{max-width:240px}.arch-img.document img{max-width:100%}}
+@media(max-width:420px){.sw{padding:20px 15px 60px}.tb h1{font-size:22px;letter-spacing:3px}.ab .at{font-size:20px}body{font-size:16px}.folio{padding:20px 12px}.folio-epigraph{font-size:14px;line-height:2}.folio-title{font-size:18px;letter-spacing:3px}.seal-btn{width:80px;height:80px}.lf-map{height:240px}.vtl-desc{font-size:14px}.ev-card .ev-body{font-size:15px}}
+</style>
+</head>
+<body>
+
+<!-- === PROLOGUE === -->
+<div id="prologue">
+  <div class="folio">
+    <div class="folio-epigraph">
+      A war is being fought with American bombs.<br>
+      A man died in a federal jail cell and the cameras failed.<br>
+      A lobby writes checks to <strong>ninety-six percent</strong> of the United States Congress.<br>
+      A people are trapped behind a wall — <em>again</em>.<br><br>
+      All of it connects. None of it connects.<br>
+      <strong>Both of these are true.</strong>
+    </div>
+    <div class="folio-line"></div>
+    <div class="folio-stakes">Recovered archival material · Provenance unverified<br>Fragment Series XVII · Vault 3</div>
+    <div class="folio-title">THE SPIRAL</div>
+    <div class="folio-sub">A Dossier of Connected Fragments</div>
+    <div class="folio-fiction">THIS IS A WORK OF SPECULATIVE FICTION · REAL NAMES AND EVENTS ARE USED IN FICTIONAL CONTEXTS · IT IS DESIGNED TO DEMONSTRATE HOW CONSPIRACY LITERATURE OPERATES ON THE MIND · THE CREATORS REJECT ALL FORMS OF ANTISEMITISM, CONSPIRACY-BASED HATRED, AND POLITICAL VIOLENCE · THIS DOCUMENT EXISTS TO REVEAL THE MACHINERY — NOT TO OPERATE IT</div>
+    <button class="seal-btn" id="seal-btn" aria-label="Break the seal"></button>
+    <div class="seal-label">Break the Seal</div>
+  </div>
+</div>
+
+<div class="fic-mark" id="fic-mark">THIS IS FICTION</div>
+<div id="prog-bar"></div>
+<div id="ch-ind"></div>
+
+<!-- === DOSSIER === -->
+<div id="dossier">
+<div class="sw">
+
+  <div class="cls rv">Restricted Archival Material — Recovered Fragments<div class="cls-line"></div>Provenance Unverified — Handle Under Protocol<div class="cls-line"></div></div>
+  <div class="tb rv">
+    <div class="cat">Fragment Series XVII · Shelf 9 · Vault 3</div>
+    <h1>THE RED SHIELD</h1>
+    <div class="sub">A Dossier Assembled from the Historical Record</div>
+    <div class="cat" style="margin-top:25px">Rot Schild — from the red sign above the house in the Judengasse<br>Frankfurt am Main, Germany · est. circa 1744</div>
+  </div>
+
+  <!-- ======== ACT I ======== -->
+  <div class="ab rv" data-ch="Act I — The Record"><div class="an">Act I</div><div class="at">The Record</div></div>
+
+  <!-- CH 1: THE WALL -->
+  <div class="ch rv" data-ch="I — The Wall">
+    <div class="chh"><span>Chapter I — The Wall</span><span class="dt">Frankfurt, Germany · 1744</span></div>
+    <h2>THE JUDENGASSE</h2>
+    <p>Begin where it begins. Not with gold. With a wall. A German wall.</p>
+    <p>The Judengasse of Frankfurt am Main was established in 1462 by order of Emperor Frederick III — a single street in the heart of Germany, three hundred meters long and no wider than four yards at its broadest point, sealed at both ends by heavy gates that locked at nightfall, on Sundays, and on all Christian holy days. Into this fissure in the city's body the entire Jewish population of Frankfurt was compressed. By the eighteenth century, approximately three thousand souls lived in fewer than two hundred houses along that single lane.</p>
+    <p>The houses could not expand outward — the walls forbade it. So they grew upward, four and five stories into the dark, and backward, carved into ever more impossible subdivisions. Families of twelve in rooms meant for three. Rooftops almost touching overhead. The street at midday a corridor of permanent twilight.</p>
+  </div>
+
+  <!-- IMAGE: Judengasse -->
+  <div class="arch-img rv">
+    <img src="frankfurt.png" alt="Die Judengasse in Frankfurt — engraving showing the narrow lane with towering buildings">
+    <div class="img-cap">Die Judengasse in Frankfurt · The lane where three thousand people lived behind locked gates<br>The street at midday a corridor of permanent twilight</div>
+  </div>
+
+  <div class="ch rv">
+    <div class="an-note">Municipal records, Frankfurt Stadtarchiv: Residents were forbidden from the main promenade, parks, farming, most trades, leaving the gate in groups larger than two. Permitted: money-lending, second-hand goods, cattle trading. The restrictions were not incidental. They were architectural.</div>
+    <p>Into this lane, in 1744, Mayer Amschel was born. The house bore a red shield — <em>rot schild</em> — hung above the door. He was orphaned at twelve. Apprenticed to the banking firm of Oppenheimer in Hannover. And somewhere in the mathematics of deprivation — in the compression of three thousand people into three hundred meters of German stone — something crystallized.</p>
+    <div class="pull">The ghetto did not merely contain the Jews. It produced them. It produced, specifically, their expertise.<span class="attr">— Amos Elon, The Pity of It All, 2002</span></div>
+    <p>This is the first recursion. Power does not simply oppress. It shapes. The wall that forbids everything except money-handling creates, over three centuries, a population with an unmatched command of money. Then the wall's architects complain that the people behind it have become too good with money. The loop is perfect. The horror is structural.</p>
+  </div>
+
+  <div class="nt rv"><p>The wall shaped a people. Now watch what they built when the wall came down.</p></div>
+
+  <!-- CH 2: THE FIVE ARROWS -->
+  <div class="ch rv" data-ch="II — The Five Arrows">
+    <div class="chh"><span>Chapter II — The Five Arrows</span><span class="dt">Europe, 1798–1820</span></div>
+    <h2>CONCORDIA, INTEGRITAS, INDUSTRIA</h2>
+    <p>Mayer Amschel had ten children who survived to adulthood. Five were sons. And he had a plan for each of them.</p>
+    <p>He sent Nathan — the boldest, the most aggressive — to London in 1798, the financial capital of the world's most powerful empire. James went to Paris in 1812, where Napoleon's wars were creating a firestorm of government debt. Salomon was dispatched to Vienna around 1820 to work alongside the Austrian statesman Metternich. Carl traveled south to Naples to manage the finances of the Italian peninsula. Amschel, the eldest, stayed in Frankfurt to anchor the network at its point of origin.</p>
+    <p>Five sons. Five capitals. One family. The coat of arms Mayer Amschel secured bore five arrows clutched in a single fist, and the motto: <em>Concordia, Integritas, Industria</em>. Harmony. Integrity. Industry.</p>
+    <div class="arrows-wrap rv">
+      <img src="https://upload.wikimedia.org/wikipedia/en/f/ff/Logo_of_N_M_Rothschild_%26_Sons.gif" alt="N M Rothschild & Sons — Five Arrows" class="arrows-logo">
+      <div class="arrows-caption">The Rothschild coat of arms · Five arrows in a single fist</div>
+    </div>
+    <p>This was not a bank. It was a nervous system laid across the body of Europe — five nodes, connected by a private courier network faster than any government post on the continent. The Rothschild messengers, identifiable by distinctive blue leather pouches, moved intelligence across borders in days while official dispatches took weeks. In an era when information traveled at the speed of a horse, the family had something approaching a telegraph.</p>
+    <p>Before Mayer Amschel died in 1812, he codified the arrangement in his will: the business was to remain exclusively within the family. No daughters or sons-in-law in management. No public auditing. The family was to remain, forever, a closed system. Of his eighteen grandchildren, <em>sixteen married first or second cousins</em>. The bloodline was the firewall.</p>
+  </div>
+
+  <!-- EUROPE MAP -->
+  <div class="lf-map rv" id="eu-map"></div>
+  <div class="lf-cap">THE ROTHSCHILD NETWORK · FIVE HOUSES ACROSS EUROPE · c. 1820<br>Each node connected by private couriers faster than any government on earth</div>
+
+  <div class="nt rv"><p>Five houses. One nervous system. Faster than any government.<br>Now watch what happens when the fastest information network on earth<br>meets the biggest battle in European history.</p></div>
+
+  <!-- CH 3: WATERLOO -->
+  <div class="ch rv" data-ch="III — Waterloo">
+    <div class="chh"><span>Chapter III — The Day the World Changed Hands</span><span class="dt">Belgium & London, June 1815</span></div>
+    <h2>WATERLOO</h2>
+    <p>To understand what Nathan Rothschild did on June 20, 1815, you need to understand what the world looked like the day before.</p>
+    <p>Napoleon Bonaparte had escaped exile on the island of Elba in March and marched back into Paris without firing a shot. The French army, sent to stop him, defected to him instead — regiment by regiment, until the Bourbon king fled and Napoleon was once again Emperor of France. Europe was in panic. The British assembled a coalition army under the Duke of Wellington. The Prussians marshaled under Field Marshal Blücher. The fate of the continent — the political order of Europe for the next century — would be decided on a muddy field in Belgium.</p>
+  </div>
+
+  <!-- IMAGE: Waterloo -->
+  <div class="arch-img wide rv">
+    <img src="Battle_of_Waterloo_1815.png" alt="The Battle of Waterloo, 1815 — painting by William Sadler">
+    <div class="img-cap">The Battle of Waterloo · June 18, 1815 · William Sadler<br>"The nearest-run thing you ever saw in your life" — Wellington</div>
+  </div>
+
+  <div class="ch rv">
+    <p>The Battle of Waterloo was fought on June 18, 1815. It was a close-run thing — Wellington himself called it "the nearest-run thing you ever saw in your life." Napoleon's Imperial Guard broke against the British lines. Blücher's Prussians arrived on Napoleon's flank. By nightfall, the French army was destroyed.</p>
+    <p>That was the battle. Now attend to the <em>information</em>.</p>
+  </div>
+
+  <!-- IMAGE: Nathan Rothschild -->
+  <div class="arch-img portrait rv">
+    <img src="Nathan_Rothschild.jpg" alt="Nathan Mayer Rothschild — portrait">
+    <div class="img-cap">Nathan Mayer Rothschild · 1777–1836<br>The man who knew before the British government</div>
+  </div>
+
+  <div class="ch rv">
+    <div class="be">
+      <p>Nathan Mayer Rothschild, in London, received confirmed intelligence of Wellington's victory via the family's courier network on June 19 or early June 20 — a full day before the British government. The official dispatches did not reach the Cabinet until late on June 21.</p>
+      <p>The legend holds that Nathan appeared at the Stock Exchange and began <em>selling</em>. The market, observing the most well-informed man in London dumping gilts, concluded Wellington had lost. Panic cascaded. Consols collapsed. At the nadir, Nathan's agents reversed and bought — massively, at a fraction of the pre-panic price. When news of victory arrived, consols surged.</p>
+      <p>The evidence for this specific sequence is contested. Ferguson considers elements embellished by later antisemitic pamphleteers. What is documented: Nathan did have advance intelligence. Nathan did make an enormous fortune on Waterloo's aftermath. The question is one of degree.</p>
+    </div>
+    <p>But what happened <em>after</em> Waterloo is more important than what happened during it.</p>
+
+    <h3>The Bond Machine</h3>
+    <p>France was required to pay an indemnity of 700 million francs. The Rothschild bank managed this — issuing bonds across multiple markets simultaneously. Unprecedented. From this moment forward, the family was not a bank. It was infrastructure. Between 1815 and 1914, the Rothschild houses issued government bonds for nearly every European state. They stood at the junction where sovereign desperation met private capital, and collected a toll for the passage.</p>
+
+    <h3>The Suez Purchase</h3>
+    <p>In November 1875, Disraeli needed £4 million overnight to buy the Khedive of Egypt's Suez Canal shares. Parliament was not in session. He sent his secretary to Lionel de Rothschild. By morning, the money was advanced. A private family financed the British Empire's acquisition of the most strategically important waterway on Earth over dinner.</p>
+
+    <h3>The Diamond Monopoly</h3>
+    <p>N. M. Rothschild & Sons provided early financing for Cecil Rhodes' De Beers Consolidated Mines. Rhodes' vision for southern Africa — the colonization of Rhodesia, the systematic dispossession of indigenous populations — was underwritten in part by Rothschild capital. The family did not pull the trigger. They financed the supply chain for the gun.</p>
+
+    <p>Remember this pattern. The junction. The toll booth. The position between two powers. It will repeat.</p>
+  </div>
+
+  <div class="nt rv"><p>Suez. The chokepoint between Asia and Africa.<br>Financed by a Rothschild. Remember this geography. It matters later.</p></div>
+
+  <!-- CH 4: THE SHADOW LEDGER -->
+  <div class="ch rv" data-ch="IV — The Shadow Ledger">
+    <div class="chh"><span>Chapter IV — The Shadow Ledger</span><span class="dt">Europe, 1820–1945</span></div>
+    <h2>WHAT THEY BECAME IN OTHER PEOPLE'S MOUTHS</h2>
+    <p>The Rothschilds' real and extraordinary power became the raw material for a mythology of hatred that would help murder six million people.</p>
+    <p>1840s pamphlets claiming the family controlled all governments. 1860s grand narratives of "Jewish world conspiracy." 1903, the forged <em>Protocols of the Elders of Zion</em>. The name detached from its referent and became a cipher — a screen onto which centuries of resentment could be projected without engaging the actual mechanisms of power.</p>
+    <div class="sb">
+      <p>The ghetto produces the expertise. The expertise produces the power. The power produces the myth. The myth produces the pogrom. The pogrom drives survivors back toward the expertise. The walls around the Judengasse were demolished in 1811. The walls in the imagination were never demolished.</p>
+    </div>
+    <p>During the Holocaust, family members were arrested, properties seized. The propaganda film <em>Die Rothschilds</em> (1940), released the same year actual Rothschilds were being hunted, stripped, and caged.</p>
+    <div class="pull">They were simultaneously accused of controlling the world and unable to save themselves from a mid-century Austrian painter with a grudge.</div>
+  </div>
+
+  <div class="nt rv"><p>The myth outlived the pogrom. It outlived the camps. It outlived the century.<br>And then, one morning in November 1917, it received a letter.</p></div>
+
+  <!-- CH 5: THE BALFOUR DECLARATION -->
+  <div class="ch rv" data-ch="V — The Letter">
+    <div class="chh"><span>Chapter V — The Letter</span><span class="dt">London, November 2, 1917</span></div>
+    <h2>DEAR LORD ROTHSCHILD</h2>
+    <p>The sixty-seven words that would redraw the map of the Middle East were addressed to Lord Walter Rothschild, 2nd Baron Rothschild, as representative of the Zionist Federation.</p>
+    <p>Walter was a zoologist — famous for driving a carriage pulled by trained zebras through London, for amassing 2.25 million butterflies, 300,000 bird skins, 200,000 bird eggs. Deeply in debt. Reportedly blackmailed. A brilliant, eccentric, trapped man. But the name. The name was the point.</p>
+  </div>
+
+  <!-- IMAGE: Balfour Declaration -->
+  <div class="arch-img document rv">
+    <img src="Balfour_declaration_unmarked.jpg" alt="The Balfour Declaration — original document, November 2, 1917">
+    <div class="img-cap">The Balfour Declaration · November 2, 1917 · Original document<br>67 words · A letter from one man to another · Promising land that belonged to neither</div>
+    <div class="doc-note">THE "EXISTING NON-JEWISH COMMUNITIES" REFERENCED CONSTITUTED APPROXIMATELY 90% OF THE POPULATION OF PALESTINE · THEY ARE NAMED BY NEGATION · DEFINED BY WHAT THEY ARE NOT · AN AFTERTHOUGHT IN A LETTER TO A BUTTERFLY COLLECTOR · THIS DOCUMENT HAD NO LEGAL FORCE · IT RESHAPED THE WORLD</div>
+  </div>
+
+  <div class="ch rv">
+    <p>Read the clause about "existing non-Jewish communities." Those four words described nine out of every ten people living in Palestine. They are defined by what they are <em>not</em>. They are an afterthought in a letter addressed to a Rothschild, and they are the reason there is a war happening right now.</p>
+  </div>
+
+  <div class="nt rv"><p>Sixty-seven words. And the entire Middle East<br>pivoted on the name at the top. Now look at the map.</p></div>
+
+  <!-- MIDDLE EAST MAP -->
+  <div class="lf-map rv" id="me-map"></div>
+  <div class="lf-cap">THE CROSSROADS OF THREE CONTINENTS · EVERY EMPIRE IN HISTORY HAS TRIED TO CONTROL THIS JUNCTION<br>PALESTINE SITS AT THE CHOKEPOINT WHERE AFRICA MEETS ASIA</div>
+
+  <div class="ch rv">
+    <p>Palestine sits at the exact junction where Africa meets Asia, where the Mediterranean meets the Red Sea, where every trade route, pipeline, and cable connecting the Eastern hemisphere must pass through or past. The Suez Canal — financed by a Rothschild — runs through this junction. Every empire in recorded history has tried to control it. The question is not religious. It is infrastructural: <em>who controls the junction?</em></p>
+  </div>
+
+  <div class="dv rv">· · · ◆ · · ·</div>
+
+  <!-- ======== ACT II ======== -->
+  <div class="ab rv" data-ch="Act II — The Descent"><div class="an">Act II</div><div class="at">The Descent</div></div>
+
+  <div class="ch rv" data-ch="VI — The Yinon Essay">
+    <div class="chh"><span>Chapter VI — The Cartographer</span><span class="dt">1982 — Present</span></div>
+    <h2>THE MAP THAT KEEPS BEING REDRAWN</h2>
+    <p>In 1982, Oded Yinon — a former Israeli Foreign Ministry official — published an essay arguing that Israel's strategic interest lay in the fragmentation of surrounding Arab states along ethnic and sectarian lines. Iraq should be divided into Sunni, Shia, and Kurdish territories. Syria should splinter. Egypt was vulnerable along its Coptic-Muslim fault line.</p>
+    <p>Meanwhile, the Israeli government shifted steadily rightward. The Likud party's 1977 platform referenced the whole Land of Israel. Netanyahu's coalition governments from 2009 onward included ultranationalists openly advocating annexation. Finance Minister Smotrich posted a map of "Greater Israel" including Jordan. National Security Minister Ben Gvir has been convicted of supporting a terrorist organization.</p>
+    <p>Meanwhile: Iraq was invaded and splintered. Syria collapsed. Libya fractured. The map Yinon sketched — fragmented Arab states surrounding an expanding Israel — looks more like the present Middle East with each passing year.</p>
+    <p>Coincidence? Or blueprint? Hold that question. Let me show you more.</p>
+  </div>
+
+  <div class="nt rv"><p>The facts are accumulating. You can feel the thread forming.<br>Let it form. We'll examine it together — in a moment.</p></div>
+
+  <!-- CH 7: THE FILE -->
+  <div class="ch rv" data-ch="VII — The File">
+    <div class="chh"><span>Chapter VII — The File</span><span class="dt">Documented facts · Arranged in sequence</span></div>
+    <h2>EVIDENCE RECOVERED FROM MULTIPLE SOURCES</h2>
+    <p>What follows is a series of documented facts, presented in the form they would take if you found them in an intelligence dossier. Each one is individually verifiable. Pay attention to what your mind does with the space between them.</p>
+  </div>
+
+  <div id="ev-stack">
+    <div class="ev-card" data-ev="1"><div class="ev-num">EXHIBIT A — INTELLIGENCE</div><div class="ev-class fact">DOCUMENTED FACT</div><div class="ev-body">Israeli intelligence services — Mossad, Shin Bet, Unit 8200 — are among the most capable in the world. The capture of Eichmann, Stuxnet, targeted assassinations across multiple continents. Former CIA officers describe the US-Israel intelligence relationship as <em>the closest and most complicated bilateral partnership in existence</em>.</div></div>
+
+    <div class="ev-narr" data-ev="2">The intelligence relationship is real. Now look at how it extends into domestic politics.</div>
+
+    <div class="ev-card" data-ev="3"><div class="ev-num">EXHIBIT B — INFLUENCE</div><div class="ev-class fact">DOCUMENTED FACT</div><div class="ev-body">AIPAC spent over <em>$100 million</em> on Congressional campaigns in 2024. Its endorsed candidates won in the vast majority of races. Multiple sitting members of Congress have stated on the record that they cannot oppose AIPAC and survive a primary. Ninety-six percent of Congress received AIPAC-affiliated contributions.</div></div>
+
+    <div class="ev-narr" data-ev="4">$100 million. Ninety-six percent. Those numbers are public. Now look at the other network.</div>
+
+    <div class="ev-card" data-ev="5"><div class="ev-num">EXHIBIT C — THE NETWORK</div><div class="ev-class fact">DOCUMENTED FACT</div><div class="ev-body">Jeffrey Epstein maintained relationships with <em>Bill Clinton, Donald Trump, Ehud Barak, Bill Gates, Prince Andrew</em>, and dozens of others. Court documents, flight logs, and visitor records confirm these associations. Ehud Barak — former Prime Minister and Defense Minister of Israel — was photographed entering Epstein's New York residence multiple times.</div></div>
+
+    <div class="ev-narr" data-ev="6">Clinton. Trump. The former Prime Minister of Israel. How did it end?</div>
+
+    <div class="ev-card" data-ev="7"><div class="ev-num">EXHIBIT D — THE DEATH</div><div class="ev-class fact">DOCUMENTED FACT</div><div class="ev-body">Epstein was found dead in his cell on August 10, 2019. Both guards assigned to check on him had <em>fallen asleep</em> and falsified records. The surveillance camera <em>malfunctioned</em>. He had been removed from suicide watch despite a previous attempt. The most valuable witness in a generation — dead. No footage exists.</div></div>
+
+    <div class="ev-narr" data-ev="8">The cameras failed. The guards slept. Now: who was behind him?</div>
+
+    <div class="ev-card spec" data-ev="9"><div class="ev-num">EXHIBIT E — THE HANDLER</div><div class="ev-class alleged">ALLEGED — VARYING RELIABILITY</div><div class="ev-body">Ghislaine Maxwell's father, Robert Maxwell: six serving and former heads of Israeli intelligence attended his funeral in Jerusalem. Israeli PM Yitzhak Shamir eulogized him as a man who had <em>"done more for Israel than can today be said."</em> Former Israeli intelligence officer Ari Ben-Menashe has publicly alleged Epstein and Maxwell were intelligence assets. Officially unconfirmed.</div></div>
+
+    <div class="ev-narr" data-ev="10">"More for Israel than can today be said." Six intelligence chiefs. His daughter ran the operation.</div>
+
+    <div class="ev-card spec" data-ev="11"><div class="ev-num">EXHIBIT F — THE THREAD</div><div class="ev-class alleged">SPECULATIVE CONSTRUCTION</div><div class="ev-body">The conspiracy version assembles these exhibits into one narrative: Rothschild financing → Balfour Declaration → the state of Israel → AIPAC's capture of Congress → intelligence operations → Epstein's blackmail network → leverage over Clinton <em>and</em> Trump → American foreign policy bent permanently toward Israeli interests → settlement expansion → Greater Israel from the Nile to the Euphrates → the destruction of Iraq, Syria, Libya → <strong>and now: the bombing of Iran.</strong></div></div>
+
+    <div class="ev-narr" data-ev="12">One thread. A German ghetto in 1744 to American bombs falling on Tehran in 2025. Every node is real. Every node is documented. And the thread between them is the most dangerous story on earth — because it is close enough to the truth to swallow you whole.</div>
+  </div>
+
+  <div class="dv rv">· · · ◆ · · ·</div>
+
+  <!-- ======== ACT III ======== -->
+  <div class="ab rv" data-ch="Act III — The Rupture"><div class="an">Act III</div><div class="at">The Rupture</div></div>
+
+  <div class="rupture">
+    <div class="ch rv" data-ch="IX — The Mirror">
+      <div class="chh"><span>Chapter IX — The Mirror</span><span class="dt">Now — your eyes on this screen</span></div>
+      <h2>WHAT JUST HAPPENED TO YOU</h2>
+
+      <p>You felt it. The thread tightening. The pattern forming. The sense that something was being <em>revealed</em>.</p>
+      <p>Every fact in that file is real. The AIPAC spending is public. Epstein's connections are court documents. The cameras did fail. The guards did sleep. Robert Maxwell's funeral was attended by intelligence chiefs. These are not inventions.</p>
+      <p>What is invented is the <em>thread</em>. The single gleaming line from a German ghetto to falling bombs. What is invented is the <em>agent</em> — the hidden hand, the puppeteer behind the puppeteers. What is invented is the idea that this required <em>coordination</em> rather than the far more terrifying possibility: that it is all structure. That no one is driving. That the machine runs itself.</p>
+      <p>I arranged those facts in sequence — <em>I</em>, the writer of this document — because I understand how your pattern-recognition engine works. I did not lie to you. I <em>curated</em> you into a feeling that felt like discovery.</p>
+
+      <div class="sb">
+        <p>You are holding a device designed to interrupt you. While you've been reading, notifications have accumulated. The feed has refreshed. An algorithm has noticed you've been gone too long and is preparing the lure to bring you back.</p>
+        <p>You stayed anyway.</p>
+        <p>You stayed because I told you a story that felt like it was <em>revealing</em> something. That dark thrill of hidden knowledge is the most addictive information-commodity on earth. And I need you to understand: <strong>that feeling is the weapon.</strong></p>
+        <p>There is a war being fought right now that is not the war in the Middle East and not the war in Iran. It is the war for your <em>attention</em>. The flood of information — the scroll, the refresh, the alert, the algorithmic recommendation — is not noise. It is a <em>shaping operation</em>. It shapes what you believe is happening. It shapes what you think you can do about it. It shapes who you trust and who you hate and what you believe is possible.</p>
+        <p>Your attention is sacred ground. It is the only territory you actually control — the small, irreducible space between what reaches your eyes and what you choose to do with it. Every force on earth — every government, every corporation, every algorithm, every propagandist — is fighting to occupy that ground. Most of them are winning. You have been scrolling through a battlefield and mistaking it for a feed.</p>
+        <p>Every conspiracy theory is a product of this flood. Not a challenge to it — a <em>product</em>. The conspiracy emerges when information exceeds the mind's capacity to structure it, and the mind — starving for coherence — grabs the nearest thread and pulls. The thread feels like resistance. It feels like waking up. It feels like fighting the machine.</p>
+        <p>It <em>is</em> the machine. The conspiracy is the flood wearing a mask. The attention economy's most perfect product: content so engaging that the person consuming it believes they are escaping the system while feeding it. The machine measures one thing: <em>did you stay?</em></p>
+        <p>I kept you. I am showing you the inside of the machine by operating it on you. The Word against the Flood — and the Flood is not the water. The Flood is the <em>shaping</em>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="dv rv">· · · ◆ · · ·</div>
+
+  <!-- THE TIMELINE — now a retrospective compression after the full narrative -->
+  <div class="ch rv"><div class="chh"><span>The Arc — Compressed</span><span class="dt">Two centuries in nine nodes</span></div>
+    <h2>LOOK BACK AT WHAT YOU JUST TRAVELED</h2>
+    <p>You have now read the full narrative — from the Judengasse to the present. Here it is compressed. Notice how the compression itself creates the feeling of inevitability. That feeling is the conspiracy. The arc is real. The inevitability is manufactured.</p>
+  </div>
+
+  <div class="vtl rv" id="vtl">
+    <div class="vtl-node" data-vn="1"><div class="vtl-yr">1744</div><div class="vtl-ev">The Wall</div><div class="vtl-desc">Mayer Amschel born in the Frankfurt Judengasse. Three thousand people behind locked gates. The ghetto produces the expertise.</div></div>
+    <div class="vtl-node" data-vn="2"><div class="vtl-yr">1798</div><div class="vtl-ev">The Network</div><div class="vtl-desc">Nathan sent to London. Five sons, five capitals, one nervous system. Faster than any government on earth.</div></div>
+    <div class="vtl-node" data-vn="3"><div class="vtl-yr">1815</div><div class="vtl-ev">Waterloo</div><div class="vtl-desc">Nathan knows before the British government. The family underwrites the financial settlement of the Napoleonic Wars. They become the system.</div></div>
+    <div class="vtl-node" data-vn="4"><div class="vtl-yr">1875</div><div class="vtl-ev">Suez</div><div class="vtl-desc">£4 million overnight. The chokepoint between Africa and Asia, financed over dinner.</div></div>
+    <div class="vtl-node" data-vn="5"><div class="vtl-yr">1903</div><div class="vtl-ev">The Protocols</div><div class="vtl-desc">The forged document. The name becomes a weapon. The myth-machine ignites.</div></div>
+    <div class="vtl-node" data-vn="6"><div class="vtl-yr">1917</div><div class="vtl-ev">The Letter</div><div class="vtl-desc">Sixty-seven words. Dear Lord Rothschild. The map of the Middle East redrawn by a single page.</div></div>
+    <div class="vtl-node" data-vn="7"><div class="vtl-yr">1948</div><div class="vtl-ev">The State</div><div class="vtl-desc">Israel established. The afterthought clause — "existing non-Jewish communities" — becomes eighty years of war.</div></div>
+    <div class="vtl-node" data-vn="8"><div class="vtl-yr">1982</div><div class="vtl-ev">The Yinon Essay</div><div class="vtl-desc">Twelve pages in a minor journal. A map of fragmented Arab states. The conspiracy's Rosetta Stone.</div></div>
+    <div class="vtl-node" data-vn="9"><div class="vtl-yr">Now</div><div class="vtl-ev">The Spiral Continues</div><div class="vtl-desc">Bombs falling. Cameras failing. Lobbies writing checks. And you, here, reading — trying to find the thread. The thread is the trap.</div></div>
+  </div>
+
+  <div class="dv rv">· · · ◆ · · ·</div>
+
+  <!-- ======== ACT IV ======== -->
+  <div class="ab rv" data-ch="Act IV — The Return"><div class="an">Act IV</div><div class="at">The Return</div></div>
+
+  <div class="ch rv" data-ch="X — What Remains">
+    <div class="chh"><span>Chapter X — What Remains</span><span class="dt">The world you actually live in</span></div>
+    <h2>THE VISIBLE</h2>
+    <p>Children are dead in Gaza. Their names are known. Their ages are known.</p>
+    <p>Bombs are falling on Iran. The authorization was signed by a human being. The weapons were manufactured in American factories, loaded onto American aircraft, and delivered by American pilots. Each of these is a person who made a choice.</p>
+    <p>And the conspiracy — every conspiracy — functions as a buffer between you and these facts. If the Rothschilds did it, the deaths become plot points. If Netanyahu is a puppet, his choices become inevitable — and the word for inevitable is <em>not his fault</em>. The conspiracy that seems to condemn the powerful actually absolves them.</p>
+    <p>What is happening is not hidden. The arms deals are on record. The UN votes are on record. The vetoes are on record. The AIPAC checks are on record. You do not need a thread from the Judengasse to understand that governments are choosing violence and other governments are choosing to supply it.</p>
+    <p>You need only to look at what is in front of you and refuse to look away.</p>
+
+    <div class="sb">
+      <p>The wall produces the expertise. The expertise produces the power. The power produces the myth. The myth produces the pogrom. The pogrom produces the state. The state produces the occupation. The occupation produces the resistance. The resistance is called terrorism. The terrorism justifies the wall. New wall. Same recursion.</p>
+      <p>The violence produces the narrative. The narrative produces more violence. Somewhere underneath, actual human beings — Jewish, Palestinian, Iranian, American — none of whom chose to be born into this machinery — are dying.</p>
+    </div>
+  </div>
+
+  <div class="dv rv">· · · ◆ · · ·</div>
+
+  <div class="tq rv">
+    <div class="qt">
+      If the conspiracy is a sedative,<br>
+      and the sedative prevents you from acting,<br>
+      and the inaction permits the violence to continue —<br><br>
+      then who does the conspiracy serve?<br><br>
+      It serves the violence itself.<br><br>
+      Every hour tracing threads<br>
+      is an hour not spent opposing a war.<br>
+      Every name whispered in the dark —<br>
+      <em>Rothschild, Epstein, Illuminati, cabal</em> —<br>
+      is a name you did not speak in the light:<br><br>
+      the name of a child who is dead.
+    </div>
+  </div>
+
+  <!-- ACTION -->
+  <div class="action-box rv">
+    <h3>What You Can Actually Do</h3>
+    <p><strong>Contact your representatives.</strong> Not with conspiracy theories — with the public record. The arms deals. The vote tallies. The funding sources. AIPAC's spending is public. Your representative's votes are public. Call them. Name the specific votes. The machine depends on your silence, not your ignorance.</p>
+    <p><strong>Protect your attention.</strong> The conspiracy is a sedative; the feed is a shaping operation. Every hour you spend scrolling through algorithmic outrage is an hour you did not spend in your community, with your family, in the physical world where change actually happens. Guard the space between your eyes and your actions like the sacred ground it is.</p>
+    <p><strong>Refuse the thread. Follow the receipts.</strong> When someone offers you a grand narrative connecting everything, ask: <em>who signed the order? Who cast the vote? Who wrote the check?</em> These are public records. Follow the visible decisions of visible people. That is where power actually operates — not in the shadows, but in the fluorescent light of a congressional office.</p>
+    <p><strong>Talk to someone who disagrees with you.</strong> Not online. In person. The machine profits from your division. Every conversation across a divide is an act of resistance against an architecture designed to prevent exactly that.</p>
+    <p><strong>Walk outside at sunrise.</strong> I am not being poetic. I mean it literally. The world is not the feed. The world is the light hitting the grass. Your daughter's hand in yours. The neighbor you haven't spoken to. The thing that is real is not on your screen. Step out of the spiral. The spiral does not resolve. But <em>you</em> can.</p>
+  </div>
+
+  <div class="dv rv">· · · ◆ · · ·</div>
+  <div class="seal rv"><div class="seal-c">FINIS</div></div>
+
+  <div class="et rv">
+    THE SPIRAL — A WORK OF SPECULATIVE FICTION<br>
+    CONSPIRACY NARRATIVES CONSTRUCTED TO DEMONSTRATE THEIR OWN MACHINERY<br><br>
+    HISTORICAL SOURCES: FERGUSON (1998, 1999) · ELON (2002) · LOTTMAN (1995)<br>
+    SPECULATIVE ELEMENTS MARKED IN CHAPTER HEADERS<br><br>
+    NO CONSPIRACY THEORY HAS EVER STOPPED A WAR<br>
+    NO HIDDEN THREAD HAS EVER FED A CHILD<br>
+    NO MASTER PLAN HAS EVER BEEN MORE DANGEROUS<br>
+    THAN THE VISIBLE DECISIONS OF VISIBLE PEOPLE<br><br>
+    THE SPIRAL ENDS WHERE YOU DECIDE TO ACT<span class="ec"></span>
+  </div>
+
+  <div class="footer rv">
+    <div class="f-email"><a href="mailto:JEThomasPhD@gmail.com">JEThomasPhD@gmail.com</a></div>
+    <div class="f-made">Made with <a href="https://the-companion-dossier.com/Latent_Dialogic_Space/" target="_blank" rel="noopener">Latent Dialogic Space</a></div>
+  </div>
+
+</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+document.getElementById('seal-btn').addEventListener('click',function(){
+  const p=document.getElementById('prologue');p.classList.add('breaking');
+  setTimeout(()=>{p.style.display='none';const d=document.getElementById('dossier');d.style.display='block';document.body.style.background='var(--void)';document.getElementById('fic-mark').style.display='block';document.getElementById('prog-bar').style.display='block';document.getElementById('ch-ind').style.display='block';setTimeout(()=>d.classList.add('vis'),100);setTimeout(initMaps,500)},1800);
+});
+const rO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.rv').forEach(el=>rO.observe(el));
+window.addEventListener('scroll',()=>{const b=document.getElementById('prog-bar');if(b.style.display==='none')return;b.style.width=Math.min(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100,100)+'%'});
+const chI=document.getElementById('ch-ind');
+document.querySelectorAll('[data-ch]').forEach(el=>{new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){chI.textContent=e.target.dataset.ch;chI.style.opacity='1'}})},{threshold:0.3}).observe(el)});
+const vtl=document.getElementById('vtl');
+if(vtl){new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){vtl.querySelectorAll('.vtl-node').forEach((n,i)=>{setTimeout(()=>n.classList.add('on'),i*350)});e.target._done=true}})},{threshold:0.15}).observe(vtl)}
+const evS=document.getElementById('ev-stack');
+if(evS){let done=false;new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&!done){done=true;evS.querySelectorAll('.ev-card,.ev-narr').forEach((el,i)=>{setTimeout(()=>el.classList.add('show'),i*800)})}})},{threshold:0.1}).observe(evS)}
+
+function initMaps(){
+  const dk='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+  const emI=L.divIcon({className:'',html:'<div style="width:12px;height:12px;border-radius:50%;background:#c9a227;box-shadow:0 0 10px rgba(201,162,39,0.6);border:2px solid #0d0b08"></div>',iconSize:[12,12],iconAnchor:[6,6]});
+  const rdI=L.divIcon({className:'',html:'<div style="width:10px;height:10px;border-radius:50%;background:#8b2020;box-shadow:0 0 8px rgba(139,32,32,0.5);border:2px solid #0d0b08"></div>',iconSize:[10,10],iconAnchor:[5,5]});
+  // EUROPE
+  if(document.getElementById('eu-map')){
+    const eu=L.map('eu-map',{zoomControl:true,scrollWheelZoom:false,dragging:true,attributionControl:false}).setView([48.5,8],4);
+    L.tileLayer(dk,{subdomains:'abcd',maxZoom:8,minZoom:3}).addTo(eu);
+    const cc=[[50.11,8.68,'FRANKFURT','Origin · Amschel','The seat of the dynasty.'],[51.51,-0.12,'LONDON','Nathan · 1798','Financial capital of the British Empire.'],[48.86,2.35,'PARIS','James · 1812','French state finance and railways.'],[48.21,16.37,'VIENNA','Salomon · c.1820','Austrian Empire, Metternich alliance.'],[40.85,14.27,'NAPLES','Carl · c.1821','Italian peninsula, papal finances.']];
+    const fk=cc[0];
+    cc.forEach(c=>{L.marker([c[0],c[1]],{icon:emI}).addTo(eu).bindPopup('<strong style="color:#c9a227;letter-spacing:2px">'+c[2]+'</strong><br><span style="color:#7a7264;font-size:9px">'+c[3]+'</span><br><span style="color:#9c9484;font-size:10px;font-family:Cormorant Garamond,serif">'+c[4]+'</span>');if(c!==fk)L.polyline([[fk[0],fk[1]],[c[0],c[1]]],{color:'#8a6f1a',weight:1,dashArray:'6 4',opacity:0.5}).addTo(eu)});
+    L.polyline([[cc[1][0],cc[1][1]],[cc[2][0],cc[2][1]]],{color:'#8a6f1a',weight:.5,dashArray:'4 6',opacity:.3}).addTo(eu);
+    L.polyline([[cc[2][0],cc[2][1]],[cc[3][0],cc[3][1]]],{color:'#8a6f1a',weight:.5,dashArray:'4 6',opacity:.3}).addTo(eu);
+    setTimeout(()=>eu.invalidateSize(),500);
+  }
+  // MIDDLE EAST
+  if(document.getElementById('me-map')){
+    const me=L.map('me-map',{zoomControl:true,scrollWheelZoom:false,dragging:true,attributionControl:false}).setView([30.5,38],5);
+    L.tileLayer(dk,{subdomains:'abcd',maxZoom:8,minZoom:3}).addTo(me);
+    [[31.77,35.23,'JERUSALEM','Three faiths. Every empire. The junction.',emI],[31.25,34.79,'GAZA','2.1 million people. Under siege.',rdI],[30.04,31.24,'CAIRO','The Nile delta. Gateway to Africa.',emI],[33.89,35.50,'BEIRUT','Lebanon. The northern front.',emI],[33.51,36.29,'DAMASCUS','Syria. Civil war. Splintered.',rdI],[33.34,44.40,'BAGHDAD','Iraq. Invaded 2003. Divided.',rdI],[39.93,32.85,'ANKARA','Turkey. NATO. Ottoman successor.',emI],[24.71,46.67,'RIYADH','Saudi Arabia. Oil. Abraham Accords.',emI],[32.08,34.78,'TEL AVIV','Israel. Financial capital.',emI],[30.58,32.27,'SUEZ CANAL','Financed by Rothschild. The chokepoint.',emI],[35.69,51.39,'TEHRAN','Iran. Under bombardment. 2025.',rdI]].forEach(l=>{
+      const ic=l[4]===rdI?'#8b2020':'#c9a227';
+      L.marker([l[0],l[1]],{icon:l[4]}).addTo(me).bindPopup('<strong style="color:'+ic+';letter-spacing:2px">'+l[2]+'</strong><br><span style="color:#9c9484;font-size:10px;font-family:Cormorant Garamond,serif">'+l[3]+'</span>');
+    });
+    L.polyline([[30.04,31.24],[31.77,35.23],[33.89,35.50],[33.51,36.29],[33.34,44.40],[35.69,51.39]],{color:'#8a6f1a',weight:1,dashArray:'4 6',opacity:.3}).addTo(me);
+    L.polyline([[30.58,32.27],[31.77,35.23],[32.08,34.78]],{color:'#c9a227',weight:1,dashArray:'3 3',opacity:.4}).addTo(me);
+    setTimeout(()=>me.invalidateSize(),500);
+  }
+}
+})();
+</script>
+</body>
+</html>
