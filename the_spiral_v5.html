@@ -1,22 +1,70 @@
+<!--
+  AUDIT CHANGELOG — the_spiral_v5.html
+  Date: 2026-03-11
+
+  HEAD / META:
+  - Added <meta name="description"> for SEO
+  - Added Open Graph meta tags (og:title, og:description, og:type) for social sharing
+  - Added `defer` to Leaflet.js <script> tag to prevent render-blocking
+  - Added <noscript> fallback message for users without JavaScript
+
+  CSS:
+  - Removed unused CSS custom properties: --parch, --ember-glow (orphaned, never referenced)
+  - Replaced all `inset` shorthand with `top/right/bottom/left` for Safari <14.1 compatibility
+  - Added `will-change: transform` to body::after grain overlay for paint performance
+  - Added `.sb` margin reset at 768px and 420px breakpoints to prevent horizontal overflow
+  - Added `.sb` padding adjustment at 420px for small-screen readability
+  - Added `.action-box` padding reduction at 420px breakpoint
+  - Added `.doc-note` font-size/padding reduction at 768px for readability on tablets
+
+  JAVASCRIPT:
+  - Scroll-reveal observer (.rv): now unobserves elements after triggering (prevents memory leaks)
+  - Chapter indicator: consolidated from N separate IntersectionObservers into single shared instance
+  - Timeline animation: observer now unobserves after triggering (prevents re-animation on re-scroll)
+  - Detective file cards: observer now unobserves after triggering (prevents re-trigger on scroll-back)
+  - Map initialization: delayed from 500ms to 2200ms (after dossier opacity transition completes) for correct sizing
+  - Map initialization: wrapped in try/catch so Leaflet CDN failure doesn't break the experience
+  - Map initialization: added guard for `typeof L === 'undefined'` in case defer script hasn't loaded
+  - Progress bar: added guard against division by zero when scrollHeight equals innerHeight
+
+  IMAGES:
+  - Added `loading="lazy"` to all five <img> tags (all below fold behind seal-break)
+  - Added `onerror` handler to Wikimedia five-arrows logo (hides gracefully if 404)
+
+  ACCESSIBILITY:
+  - Seal button already has aria-label="Break the seal" (verified, no change needed)
+  - All images already have descriptive alt text (verified, no change needed)
+
+  NO CHANGES MADE TO:
+  - Narrative text, prose, captions, pull quotes, fiction disclaimer, or action items
+  - Color palette, typography, or design language
+  - Four-act structure or emotional arc
+  - Footer (email and Latent Dialogic Space link)
+  - Class naming conventions
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="THE SPIRAL — A work of speculative fiction that demonstrates how conspiracy literature operates on the mind. Historical fact woven with narrative to reveal the machinery of conspiratorial thinking.">
+<meta property="og:title" content="THE SPIRAL — A Work of Speculative Fiction">
+<meta property="og:description" content="A museum-quality speculative fiction experience weaving historical fact with conspiracy narrative to reveal how the machinery operates on your mind.">
+<meta property="og:type" content="article">
 <title>THE SPIRAL — A Work of Speculative Fiction</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,300;1,400&family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-:root{--void:#030303;--parch:#0a0906;--frag:#0d0b08;--ember:#c9a227;--ember-dim:#8a6f1a;--ember-glow:#e6c044;--blood:#6b1a1a;--blood-b:#8b2020;--ash:#9c9484;--bone:#d4cbb8;--ink:#c2b8a2;--ink-f:#7a7264;--ink-g:#4a4538;--iron:#3a3632;--wax:#7a1a1a;--wax-light:#a82828}
+:root{--void:#030303;--frag:#0d0b08;--ember:#c9a227;--ember-dim:#8a6f1a;--blood:#6b1a1a;--blood-b:#8b2020;--ash:#9c9484;--bone:#d4cbb8;--ink:#c2b8a2;--ink-f:#7a7264;--ink-g:#4a4538;--iron:#3a3632;--wax:#7a1a1a;--wax-light:#a82828}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:#000;color:var(--ink);font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.75;overflow-x:hidden}
-body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;will-change:transform}
 
 /* === PROLOGUE === */
-#prologue{position:fixed;inset:0;background:var(--void);z-index:8000;display:flex;align-items:center;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
-#prologue::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(201,162,39,0.03) 0%,transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(107,26,26,0.04) 0%,transparent 50%);pointer-events:none}
+#prologue{position:fixed;top:0;right:0;bottom:0;left:0;background:var(--void);z-index:8000;display:flex;align-items:center;justify-content:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#prologue::before{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:radial-gradient(ellipse at 50% 40%,rgba(201,162,39,0.03) 0%,transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(107,26,26,0.04) 0%,transparent 50%);pointer-events:none}
 .folio{position:relative;z-index:2;max-width:620px;width:92%;margin:auto;padding:40px 30px;text-align:center}
 .folio-epigraph{font-size:16px;font-style:italic;color:var(--ink-f);line-height:2.2;margin-bottom:35px;opacity:0;animation:pf 2s .5s ease forwards}
 .folio-epigraph strong{color:var(--bone);font-weight:600;font-style:normal}
@@ -28,8 +76,8 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 .folio-fiction{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--blood-b);letter-spacing:2px;line-height:2;margin-bottom:30px;padding:14px;border:1px solid rgba(107,26,26,0.25);opacity:0;animation:pf 2s 3.8s ease forwards}
 .seal-btn{position:relative;display:inline-block;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--wax-light),var(--wax) 60%,#4a0e0e 100%);border:none;cursor:pointer;box-shadow:0 4px 20px rgba(0,0,0,0.6),inset 0 2px 4px rgba(255,255,255,0.1),inset 0 -2px 6px rgba(0,0,0,0.3);opacity:0;animation:pf 2s 4.4s ease forwards;transition:transform .3s,box-shadow .3s}
 .seal-btn:hover{transform:scale(1.05);box-shadow:0 6px 30px rgba(122,26,26,0.4),inset 0 2px 4px rgba(255,255,255,0.1)}
-.seal-btn::before{content:'✦';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:22px;color:rgba(255,220,180,0.5);text-shadow:0 1px 2px rgba(0,0,0,0.5)}
-.seal-btn::after{content:'';position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(255,220,180,0.15)}
+.seal-btn::before{content:'✦';position:absolute;top:0;right:0;bottom:0;left:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:22px;color:rgba(255,220,180,0.5);text-shadow:0 1px 2px rgba(0,0,0,0.5)}
+.seal-btn::after{content:'';position:absolute;top:8px;right:8px;bottom:8px;left:8px;border-radius:50%;border:1px solid rgba(255,220,180,0.15)}
 .seal-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--ink-g);text-transform:uppercase;margin-top:15px;opacity:0;animation:pf 2s 4.8s ease forwards}
 @keyframes pf{to{opacity:1}}
 #prologue.breaking{animation:sbrk 1.8s ease forwards}
@@ -138,7 +186,7 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 .seal{text-align:center;padding:40px 0}
 .seal-c{display:inline-block;width:110px;height:110px;border:2px solid var(--ember-dim);border-radius:50%;line-height:110px;font-family:'Cinzel',serif;font-size:14px;letter-spacing:3px;color:var(--ember);position:relative}
 .seal-c::before,.seal-c::after{content:'';position:absolute;border-radius:50%;border:1px solid var(--iron)}
-.seal-c::before{inset:6px}.seal-c::after{inset:-8px}
+.seal-c::before{top:6px;right:6px;bottom:6px;left:6px}.seal-c::after{top:-8px;right:-8px;bottom:-8px;left:-8px}
 .et{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-g);text-align:center;padding:50px 0;letter-spacing:2px;line-height:2.2}
 .ec{display:inline-block;width:8px;height:13px;background:var(--ember);animation:blink 1.2s step-end infinite;vertical-align:text-bottom;margin-left:3px}
 @keyframes blink{50%{opacity:0}}
@@ -151,11 +199,12 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 .rv{opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
 .rv.vis{opacity:1;transform:translateY(0)}
 
-@media(max-width:768px){.sw{padding:30px 20px 80px}.tb h1{font-size:28px;letter-spacing:4px}.ch h2{font-size:20px}.ab .at{font-size:24px}.tq .qt{font-size:20px}.pull{font-size:18px;padding:20px 15px}.lf-map{height:300px}.fic-mark{font-size:8px;right:8px}#ch-ind{font-size:8px;left:10px;bottom:10px}.folio{padding:30px 16px}.folio-epigraph{font-size:15px}.folio-title{font-size:22px;letter-spacing:4px}.vtl{padding-left:30px}.vtl::before{left:10px}.vtl-node{padding-left:22px}.vtl-node::before{left:-26px}.ev-card{padding:16px}.arch-img.portrait img{max-width:240px}.arch-img.document img{max-width:100%}}
-@media(max-width:420px){.sw{padding:20px 15px 60px}.tb h1{font-size:22px;letter-spacing:3px}.ab .at{font-size:20px}body{font-size:16px}.folio{padding:20px 12px}.folio-epigraph{font-size:14px;line-height:2}.folio-title{font-size:18px;letter-spacing:3px}.seal-btn{width:80px;height:80px}.lf-map{height:240px}.vtl-desc{font-size:14px}.ev-card .ev-body{font-size:15px}}
+@media(max-width:768px){.sw{padding:30px 20px 80px}.tb h1{font-size:28px;letter-spacing:4px}.ch h2{font-size:20px}.ab .at{font-size:24px}.tq .qt{font-size:20px}.pull{font-size:18px;padding:20px 15px}.lf-map{height:300px}.fic-mark{font-size:8px;right:8px}#ch-ind{font-size:8px;left:10px;bottom:10px}.folio{padding:30px 16px}.folio-epigraph{font-size:15px}.folio-title{font-size:22px;letter-spacing:4px}.vtl{padding-left:30px}.vtl::before{left:10px}.vtl-node{padding-left:22px}.vtl-node::before{left:-26px}.ev-card{padding:16px}.arch-img.portrait img{max-width:240px}.arch-img.document img{max-width:100%}.sb{margin-left:0;margin-right:0}.doc-note{font-size:9px;padding:0 5px}}
+@media(max-width:420px){.sw{padding:20px 15px 60px}.tb h1{font-size:22px;letter-spacing:3px}.ab .at{font-size:20px}body{font-size:16px}.folio{padding:20px 12px}.folio-epigraph{font-size:14px;line-height:2}.folio-title{font-size:18px;letter-spacing:3px}.seal-btn{width:80px;height:80px}.lf-map{height:240px}.vtl-desc{font-size:14px}.ev-card .ev-body{font-size:15px}.sb{margin-left:0;margin-right:0;padding:30px 15px}.action-box{padding:20px 15px}}
 </style>
 </head>
 <body>
+<noscript><div style="background:#030303;color:#c2b8a2;font-family:Georgia,serif;padding:60px 40px;text-align:center;min-height:100vh;display:flex;align-items:center;justify-content:center"><div style="max-width:520px"><h1 style="font-size:24px;color:#c9a227;letter-spacing:4px;margin-bottom:20px">THE SPIRAL</h1><p style="line-height:1.8">This experience requires JavaScript to operate. Please enable JavaScript in your browser settings and reload the page.</p></div></div></noscript>
 
 <!-- === PROLOGUE === -->
 <div id="prologue">
@@ -208,7 +257,7 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 
   <!-- IMAGE: Judengasse -->
   <div class="arch-img rv">
-    <img src="frankfurt.png" alt="Die Judengasse in Frankfurt — engraving showing the narrow lane with towering buildings">
+    <img src="frankfurt.png" alt="Die Judengasse in Frankfurt — engraving showing the narrow lane with towering buildings" loading="lazy">
     <div class="img-cap">Die Judengasse in Frankfurt · The lane where three thousand people lived behind locked gates<br>The street at midday a corridor of permanent twilight</div>
   </div>
 
@@ -229,7 +278,7 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
     <p>He sent Nathan — the boldest, the most aggressive — to London in 1798, the financial capital of the world's most powerful empire. James went to Paris in 1812, where Napoleon's wars were creating a firestorm of government debt. Salomon was dispatched to Vienna around 1820 to work alongside the Austrian statesman Metternich. Carl traveled south to Naples to manage the finances of the Italian peninsula. Amschel, the eldest, stayed in Frankfurt to anchor the network at its point of origin.</p>
     <p>Five sons. Five capitals. One family. The coat of arms Mayer Amschel secured bore five arrows clutched in a single fist, and the motto: <em>Concordia, Integritas, Industria</em>. Harmony. Integrity. Industry.</p>
     <div class="arrows-wrap rv">
-      <img src="https://upload.wikimedia.org/wikipedia/en/f/ff/Logo_of_N_M_Rothschild_%26_Sons.gif" alt="N M Rothschild & Sons — Five Arrows" class="arrows-logo">
+      <img src="https://upload.wikimedia.org/wikipedia/en/f/ff/Logo_of_N_M_Rothschild_%26_Sons.gif" alt="N M Rothschild & Sons — Five Arrows" class="arrows-logo" loading="lazy" onerror="this.style.display='none'">
       <div class="arrows-caption">The Rothschild coat of arms · Five arrows in a single fist</div>
     </div>
     <p>This was not a bank. It was a nervous system laid across the body of Europe — five nodes, connected by a private courier network faster than any government post on the continent. The Rothschild messengers, identifiable by distinctive blue leather pouches, moved intelligence across borders in days while official dispatches took weeks. In an era when information traveled at the speed of a horse, the family had something approaching a telegraph.</p>
@@ -252,7 +301,7 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 
   <!-- IMAGE: Waterloo -->
   <div class="arch-img wide rv">
-    <img src="Battle_of_Waterloo_1815.png" alt="The Battle of Waterloo, 1815 — painting by William Sadler">
+    <img src="Battle_of_Waterloo_1815.png" alt="The Battle of Waterloo, 1815 — painting by William Sadler" loading="lazy">
     <div class="img-cap">The Battle of Waterloo · June 18, 1815 · William Sadler<br>"The nearest-run thing you ever saw in your life" — Wellington</div>
   </div>
 
@@ -263,7 +312,7 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 
   <!-- IMAGE: Nathan Rothschild -->
   <div class="arch-img portrait rv">
-    <img src="Nathan_Rothschild.jpg" alt="Nathan Mayer Rothschild — portrait">
+    <img src="Nathan_Rothschild.jpg" alt="Nathan Mayer Rothschild — portrait" loading="lazy">
     <div class="img-cap">Nathan Mayer Rothschild · 1777–1836<br>The man who knew before the British government</div>
   </div>
 
@@ -314,7 +363,7 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 
   <!-- IMAGE: Balfour Declaration -->
   <div class="arch-img document rv">
-    <img src="Balfour_declaration_unmarked.jpg" alt="The Balfour Declaration — original document, November 2, 1917">
+    <img src="Balfour_declaration_unmarked.jpg" alt="The Balfour Declaration — original document, November 2, 1917" loading="lazy">
     <div class="img-cap">The Balfour Declaration · November 2, 1917 · Original document<br>67 words · A letter from one man to another · Promising land that belonged to neither</div>
     <div class="doc-note">THE "EXISTING NON-JEWISH COMMUNITIES" REFERENCED CONSTITUTED APPROXIMATELY 90% OF THE POPULATION OF PALESTINE · THEY ARE NAMED BY NEGATION · DEFINED BY WHAT THEY ARE NOT · AN AFTERTHOUGHT IN A LETTER TO A BUTTERFLY COLLECTOR · THIS DOCUMENT HAD NO LEGAL FORCE · IT RESHAPED THE WORLD</div>
   </div>
@@ -506,44 +555,72 @@ body::after{content:'';position:fixed;inset:0;background:url("data:image/svg+xml
 'use strict';
 document.getElementById('seal-btn').addEventListener('click',function(){
   const p=document.getElementById('prologue');p.classList.add('breaking');
-  setTimeout(()=>{p.style.display='none';const d=document.getElementById('dossier');d.style.display='block';document.body.style.background='var(--void)';document.getElementById('fic-mark').style.display='block';document.getElementById('prog-bar').style.display='block';document.getElementById('ch-ind').style.display='block';setTimeout(()=>d.classList.add('vis'),100);setTimeout(initMaps,500)},1800);
+  setTimeout(()=>{
+    p.style.display='none';
+    const d=document.getElementById('dossier');
+    d.style.display='block';
+    document.body.style.background='var(--void)';
+    document.getElementById('fic-mark').style.display='block';
+    document.getElementById('prog-bar').style.display='block';
+    document.getElementById('ch-ind').style.display='block';
+    setTimeout(()=>d.classList.add('vis'),100);
+    /* Wait for the dossier opacity transition (2s) to complete before initializing maps,
+       so Leaflet can measure container dimensions correctly */
+    setTimeout(initMaps,2200);
+  },1800);
 });
-const rO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis')})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+
+/* Scroll-triggered reveals — unobserve after triggering to prevent memory leaks */
+const rO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');rO.unobserve(e.target)}})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.rv').forEach(el=>rO.observe(el));
-window.addEventListener('scroll',()=>{const b=document.getElementById('prog-bar');if(b.style.display==='none')return;b.style.width=Math.min(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100,100)+'%'});
+
+/* Progress bar */
+window.addEventListener('scroll',()=>{const b=document.getElementById('prog-bar');if(b.style.display==='none')return;const h=document.documentElement.scrollHeight-window.innerHeight;if(h>0)b.style.width=Math.min(window.scrollY/h*100,100)+'%'});
+
+/* Chapter indicator — single observer for all chapter headings */
 const chI=document.getElementById('ch-ind');
-document.querySelectorAll('[data-ch]').forEach(el=>{new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){chI.textContent=e.target.dataset.ch;chI.style.opacity='1'}})},{threshold:0.3}).observe(el)});
+const chO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){chI.textContent=e.target.dataset.ch;chI.style.opacity='1'}})},{threshold:0.3});
+document.querySelectorAll('[data-ch]').forEach(el=>chO.observe(el));
+
+/* Vertical timeline — animate nodes sequentially, unobserve after */
 const vtl=document.getElementById('vtl');
-if(vtl){new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){vtl.querySelectorAll('.vtl-node').forEach((n,i)=>{setTimeout(()=>n.classList.add('on'),i*350)});e.target._done=true}})},{threshold:0.15}).observe(vtl)}
+if(vtl){const vtlO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){vtl.querySelectorAll('.vtl-node').forEach((n,i)=>{setTimeout(()=>n.classList.add('on'),i*350)});vtlO.unobserve(e.target)}})},{threshold:0.15});vtlO.observe(vtl)}
+
+/* Detective file cards — animate in sequence, unobserve after to prevent re-trigger */
 const evS=document.getElementById('ev-stack');
-if(evS){let done=false;new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting&&!done){done=true;evS.querySelectorAll('.ev-card,.ev-narr').forEach((el,i)=>{setTimeout(()=>el.classList.add('show'),i*800)})}})},{threshold:0.1}).observe(evS)}
+if(evS){const evO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){evS.querySelectorAll('.ev-card,.ev-narr').forEach((el,i)=>{setTimeout(()=>el.classList.add('show'),i*800)});evO.unobserve(e.target)}})},{threshold:0.1});evO.observe(evS)}
 
 function initMaps(){
-  const dk='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-  const emI=L.divIcon({className:'',html:'<div style="width:12px;height:12px;border-radius:50%;background:#c9a227;box-shadow:0 0 10px rgba(201,162,39,0.6);border:2px solid #0d0b08"></div>',iconSize:[12,12],iconAnchor:[6,6]});
-  const rdI=L.divIcon({className:'',html:'<div style="width:10px;height:10px;border-radius:50%;background:#8b2020;box-shadow:0 0 8px rgba(139,32,32,0.5);border:2px solid #0d0b08"></div>',iconSize:[10,10],iconAnchor:[5,5]});
-  // EUROPE
-  if(document.getElementById('eu-map')){
-    const eu=L.map('eu-map',{zoomControl:true,scrollWheelZoom:false,dragging:true,attributionControl:false}).setView([48.5,8],4);
-    L.tileLayer(dk,{subdomains:'abcd',maxZoom:8,minZoom:3}).addTo(eu);
-    const cc=[[50.11,8.68,'FRANKFURT','Origin · Amschel','The seat of the dynasty.'],[51.51,-0.12,'LONDON','Nathan · 1798','Financial capital of the British Empire.'],[48.86,2.35,'PARIS','James · 1812','French state finance and railways.'],[48.21,16.37,'VIENNA','Salomon · c.1820','Austrian Empire, Metternich alliance.'],[40.85,14.27,'NAPLES','Carl · c.1821','Italian peninsula, papal finances.']];
-    const fk=cc[0];
-    cc.forEach(c=>{L.marker([c[0],c[1]],{icon:emI}).addTo(eu).bindPopup('<strong style="color:#c9a227;letter-spacing:2px">'+c[2]+'</strong><br><span style="color:#7a7264;font-size:9px">'+c[3]+'</span><br><span style="color:#9c9484;font-size:10px;font-family:Cormorant Garamond,serif">'+c[4]+'</span>');if(c!==fk)L.polyline([[fk[0],fk[1]],[c[0],c[1]]],{color:'#8a6f1a',weight:1,dashArray:'6 4',opacity:0.5}).addTo(eu)});
-    L.polyline([[cc[1][0],cc[1][1]],[cc[2][0],cc[2][1]]],{color:'#8a6f1a',weight:.5,dashArray:'4 6',opacity:.3}).addTo(eu);
-    L.polyline([[cc[2][0],cc[2][1]],[cc[3][0],cc[3][1]]],{color:'#8a6f1a',weight:.5,dashArray:'4 6',opacity:.3}).addTo(eu);
-    setTimeout(()=>eu.invalidateSize(),500);
-  }
-  // MIDDLE EAST
-  if(document.getElementById('me-map')){
-    const me=L.map('me-map',{zoomControl:true,scrollWheelZoom:false,dragging:true,attributionControl:false}).setView([30.5,38],5);
-    L.tileLayer(dk,{subdomains:'abcd',maxZoom:8,minZoom:3}).addTo(me);
-    [[31.77,35.23,'JERUSALEM','Three faiths. Every empire. The junction.',emI],[31.25,34.79,'GAZA','2.1 million people. Under siege.',rdI],[30.04,31.24,'CAIRO','The Nile delta. Gateway to Africa.',emI],[33.89,35.50,'BEIRUT','Lebanon. The northern front.',emI],[33.51,36.29,'DAMASCUS','Syria. Civil war. Splintered.',rdI],[33.34,44.40,'BAGHDAD','Iraq. Invaded 2003. Divided.',rdI],[39.93,32.85,'ANKARA','Turkey. NATO. Ottoman successor.',emI],[24.71,46.67,'RIYADH','Saudi Arabia. Oil. Abraham Accords.',emI],[32.08,34.78,'TEL AVIV','Israel. Financial capital.',emI],[30.58,32.27,'SUEZ CANAL','Financed by Rothschild. The chokepoint.',emI],[35.69,51.39,'TEHRAN','Iran. Under bombardment. 2025.',rdI]].forEach(l=>{
-      const ic=l[4]===rdI?'#8b2020':'#c9a227';
-      L.marker([l[0],l[1]],{icon:l[4]}).addTo(me).bindPopup('<strong style="color:'+ic+';letter-spacing:2px">'+l[2]+'</strong><br><span style="color:#9c9484;font-size:10px;font-family:Cormorant Garamond,serif">'+l[3]+'</span>');
-    });
-    L.polyline([[30.04,31.24],[31.77,35.23],[33.89,35.50],[33.51,36.29],[33.34,44.40],[35.69,51.39]],{color:'#8a6f1a',weight:1,dashArray:'4 6',opacity:.3}).addTo(me);
-    L.polyline([[30.58,32.27],[31.77,35.23],[32.08,34.78]],{color:'#c9a227',weight:1,dashArray:'3 3',opacity:.4}).addTo(me);
-    setTimeout(()=>me.invalidateSize(),500);
+  try{
+    if(typeof L==='undefined')return;
+    const dk='https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+    const emI=L.divIcon({className:'',html:'<div style="width:12px;height:12px;border-radius:50%;background:#c9a227;box-shadow:0 0 10px rgba(201,162,39,0.6);border:2px solid #0d0b08"></div>',iconSize:[12,12],iconAnchor:[6,6]});
+    const rdI=L.divIcon({className:'',html:'<div style="width:10px;height:10px;border-radius:50%;background:#8b2020;box-shadow:0 0 8px rgba(139,32,32,0.5);border:2px solid #0d0b08"></div>',iconSize:[10,10],iconAnchor:[5,5]});
+    // EUROPE
+    if(document.getElementById('eu-map')){
+      const eu=L.map('eu-map',{zoomControl:true,scrollWheelZoom:false,dragging:true,attributionControl:false}).setView([48.5,8],4);
+      L.tileLayer(dk,{subdomains:'abcd',maxZoom:8,minZoom:3}).addTo(eu);
+      const cc=[[50.11,8.68,'FRANKFURT','Origin · Amschel','The seat of the dynasty.'],[51.51,-0.12,'LONDON','Nathan · 1798','Financial capital of the British Empire.'],[48.86,2.35,'PARIS','James · 1812','French state finance and railways.'],[48.21,16.37,'VIENNA','Salomon · c.1820','Austrian Empire, Metternich alliance.'],[40.85,14.27,'NAPLES','Carl · c.1821','Italian peninsula, papal finances.']];
+      const fk=cc[0];
+      cc.forEach(c=>{L.marker([c[0],c[1]],{icon:emI}).addTo(eu).bindPopup('<strong style="color:#c9a227;letter-spacing:2px">'+c[2]+'</strong><br><span style="color:#7a7264;font-size:9px">'+c[3]+'</span><br><span style="color:#9c9484;font-size:10px;font-family:Cormorant Garamond,serif">'+c[4]+'</span>');if(c!==fk)L.polyline([[fk[0],fk[1]],[c[0],c[1]]],{color:'#8a6f1a',weight:1,dashArray:'6 4',opacity:0.5}).addTo(eu)});
+      L.polyline([[cc[1][0],cc[1][1]],[cc[2][0],cc[2][1]]],{color:'#8a6f1a',weight:.5,dashArray:'4 6',opacity:.3}).addTo(eu);
+      L.polyline([[cc[2][0],cc[2][1]],[cc[3][0],cc[3][1]]],{color:'#8a6f1a',weight:.5,dashArray:'4 6',opacity:.3}).addTo(eu);
+      setTimeout(()=>eu.invalidateSize(),500);
+    }
+    // MIDDLE EAST
+    if(document.getElementById('me-map')){
+      const me=L.map('me-map',{zoomControl:true,scrollWheelZoom:false,dragging:true,attributionControl:false}).setView([30.5,38],5);
+      L.tileLayer(dk,{subdomains:'abcd',maxZoom:8,minZoom:3}).addTo(me);
+      [[31.77,35.23,'JERUSALEM','Three faiths. Every empire. The junction.',emI],[31.25,34.79,'GAZA','2.1 million people. Under siege.',rdI],[30.04,31.24,'CAIRO','The Nile delta. Gateway to Africa.',emI],[33.89,35.50,'BEIRUT','Lebanon. The northern front.',emI],[33.51,36.29,'DAMASCUS','Syria. Civil war. Splintered.',rdI],[33.34,44.40,'BAGHDAD','Iraq. Invaded 2003. Divided.',rdI],[39.93,32.85,'ANKARA','Turkey. NATO. Ottoman successor.',emI],[24.71,46.67,'RIYADH','Saudi Arabia. Oil. Abraham Accords.',emI],[32.08,34.78,'TEL AVIV','Israel. Financial capital.',emI],[30.58,32.27,'SUEZ CANAL','Financed by Rothschild. The chokepoint.',emI],[35.69,51.39,'TEHRAN','Iran. Under bombardment. 2025.',rdI]].forEach(l=>{
+        const ic=l[4]===rdI?'#8b2020':'#c9a227';
+        L.marker([l[0],l[1]],{icon:l[4]}).addTo(me).bindPopup('<strong style="color:'+ic+';letter-spacing:2px">'+l[2]+'</strong><br><span style="color:#9c9484;font-size:10px;font-family:Cormorant Garamond,serif">'+l[3]+'</span>');
+      });
+      L.polyline([[30.04,31.24],[31.77,35.23],[33.89,35.50],[33.51,36.29],[33.34,44.40],[35.69,51.39]],{color:'#8a6f1a',weight:1,dashArray:'4 6',opacity:.3}).addTo(me);
+      L.polyline([[30.58,32.27],[31.77,35.23],[32.08,34.78]],{color:'#c9a227',weight:1,dashArray:'3 3',opacity:.4}).addTo(me);
+      setTimeout(()=>me.invalidateSize(),500);
+    }
+  }catch(e){
+    /* Leaflet CDN failed — the experience continues without maps */
   }
 }
 })();
