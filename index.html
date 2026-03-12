@@ -143,7 +143,7 @@ body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:u
 
 /* === ARCHIVAL IMAGES === */
 .arch-img{position:relative;margin:35px 0;text-align:center}
-.arch-img img{max-width:100%;height:auto;border:1px solid var(--iron);filter:sepia(0.15) contrast(1.05);opacity:0.9;display:block;margin:0 auto}
+.arch-img img{max-width:520px;width:100%;height:auto;border:1px solid var(--iron);filter:sepia(0.15) contrast(1.05);opacity:0.9;display:block;margin:0 auto}
 .arch-img .img-cap{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-g);letter-spacing:2px;text-transform:uppercase;margin-top:10px;text-align:center;line-height:1.8}
 .arch-img.portrait img{max-width:320px}
 .arch-img.document img{max-width:600px;filter:none;opacity:0.95}
@@ -227,6 +227,21 @@ body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:u
 .rv{opacity:0;transform:translateY(18px);transition:opacity .8s,transform .8s}
 .rv.vis{opacity:1;transform:translateY(0)}
 
+/* === TYPEWRITER CONSPIRACY SEQUENCE === */
+.tw-wrap{padding:40px 20px 30px;text-align:left;max-width:640px;margin:0 auto}
+.tw-line{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ember);letter-spacing:1px;line-height:2.2;opacity:0;transform:translateY(4px);transition:opacity .6s,transform .6s}
+.tw-line.on{opacity:1;transform:translateY(0)}
+.tw-line .caret{display:inline-block;width:2px;height:14px;background:var(--ember);margin-left:2px;animation:blink 0.7s step-end infinite;vertical-align:text-bottom}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.tw-line.dead .caret{display:none}
+.tw-line.ghost{color:var(--ink-g);opacity:0;transition:opacity 1.5s}
+.tw-line.ghost.on{opacity:0.5}
+.tw-halt{text-align:center;padding:50px 20px 10px;opacity:0;transform:scale(0.95);transition:opacity 1.2s,transform 1.2s}
+.tw-halt.on{opacity:1;transform:scale(1)}
+.tw-halt .halt-word{font-family:'Cinzel',serif;font-size:36px;color:var(--blood-b);letter-spacing:12px;display:block;margin-bottom:20px}
+.tw-halt p{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-f);letter-spacing:1px;line-height:2;max-width:500px;margin:0 auto}
+.tw-halt .halt-breath{display:block;margin-top:25px;font-size:10px;color:var(--ink-g);letter-spacing:4px;text-transform:uppercase}
+
 @media(max-width:768px){.sw{padding:30px 20px 80px}.tb h1{font-size:28px;letter-spacing:4px}.ch h2{font-size:20px}.ab .at{font-size:24px}.tq .qt{font-size:20px}.pull{font-size:18px;padding:20px 15px}.lf-map{height:300px}.fic-mark{font-size:8px;right:8px}#ch-ind{font-size:8px;left:10px;bottom:10px}.folio{padding:30px 16px}.folio-epigraph{font-size:15px}.folio-title{font-size:22px;letter-spacing:4px}.vtl{padding-left:30px}.vtl::before{left:10px}.vtl-node{padding-left:22px}.vtl-node::before{left:-26px}.ev-card{padding:16px}.arch-img.portrait img{max-width:240px}.arch-img.document img{max-width:100%}.sb{margin-left:0;margin-right:0}.doc-note{font-size:9px;padding:0 5px}}
 @media(max-width:420px){.sw{padding:20px 15px 60px}.tb h1{font-size:22px;letter-spacing:3px}.ab .at{font-size:20px}body{font-size:16px}.folio{padding:20px 12px}.folio-epigraph{font-size:14px;line-height:2}.folio-title{font-size:18px;letter-spacing:3px}.seal-btn{width:80px;height:80px}.lf-map{height:240px}.vtl-desc{font-size:14px}.ev-card .ev-body{font-size:15px}.sb{margin-left:0;margin-right:0;padding:30px 15px}.action-box{padding:20px 15px}}
 </style>
@@ -280,7 +295,7 @@ body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:u
   <div class="ch rv" data-ch="I — The Wall">
     <div class="chh"><span>Chapter I — The Wall</span><span class="dt">Frankfurt, Germany · 1744</span></div>
     <h2>THE JUDENGASSE</h2>
-    <p>Begin where it begins. Not with gold. With a wall. A German wall.</p>
+    <p>Let us begin where the story truly begins. Not with gold. With a wall. A German wall.</p>
     <p>The Judengasse of Frankfurt am Main was established in 1462 by order of <span class="gh">Emperor Frederick III<span class="gh-t">Frederick III (1415–1493), Holy Roman Emperor. His decree forcing Jews into a segregated quarter was not unusual — similar ghettos existed across Europe — but the Frankfurt Judengasse became the most densely populated and lasted longer than most, surviving until Napoleonic-era reforms.</span></span> — a single street in the heart of Germany, three hundred meters long and no wider than four yards at its broadest point, sealed at both ends by heavy gates that locked at nightfall, on Sundays, and on all Christian holy days. Into this fissure in the city's body the entire Jewish population of Frankfurt was compressed. By the eighteenth century, approximately three thousand souls lived in fewer than two hundred houses along that single lane.</p>
     <p>The houses could not expand outward — the walls forbade it. So they grew upward, four and five stories into the dark, and backward, carved into ever more impossible subdivisions. Families of twelve in rooms meant for three. Rooftops almost touching overhead. The street at midday a corridor of permanent twilight.</p>
   </div>
@@ -302,7 +317,7 @@ body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:u
 
   <!-- CH 2: THE FIVE ARROWS -->
   <div class="ch rv" data-ch="II — The Five Arrows">
-    <div class="chh"><span>Chapter II — The Five Arrows</span><span class="dt">Europe, 1798–1820</span></div>
+    <div class="chh"><span>Chapter II — The Five Arrows</span><span class="dt">Europe, 1798–1812</span></div>
     <h2>CONCORDIA, INTEGRITAS, INDUSTRIA</h2>
     <p>Mayer Amschel had ten children who survived to adulthood. Five were sons. And he had a plan for each of them.</p>
     <p>He sent Nathan — the boldest, the most aggressive — to London in 1798, the financial capital of the world's most powerful empire. James went to Paris in 1812, where Napoleon's wars were creating a firestorm of government debt. Salomon was dispatched to Vienna around 1820 to work alongside the Austrian statesman <span class="gh">Metternich<span class="gh-t">Prince Klemens von Metternich, the Austrian chancellor who dominated European diplomacy after Napoleon's defeat. He built the "Concert of Europe" — the conservative order the Rothschilds would finance for a century.</span></span>. Carl traveled south to Naples to manage the finances of the Italian peninsula. Amschel, the eldest, stayed in Frankfurt to anchor the network at its point of origin.</p>
@@ -434,8 +449,12 @@ body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:u
     <h2>THE MAP THAT KEEPS BEING REDRAWN</h2>
     <p>In 1982, Oded Yinon — a former Israeli Foreign Ministry official — published an essay in <span class="gh"><em>Kivunim</em><span class="gh-t">"Directions" — a journal published by the World Zionist Organization. Yinon's essay, "A Strategy for Israel in the Nineteen Eighties," was largely ignored at the time of publication. It was translated into English by Israel Shahak and later gained prominence in conspiracy circles as an alleged "master plan."</span></span> arguing that Israel's strategic interest lay in the fragmentation of surrounding Arab states along ethnic and sectarian lines. Iraq should be divided into Sunni, Shia, and Kurdish territories. Syria should splinter. Egypt was vulnerable along its Coptic-Muslim fault line.</p>
     <p>Meanwhile, the Israeli government shifted steadily rightward. The <span class="gh">Likud<span class="gh-t">Israel's dominant right-wing party, founded in 1973 by Menachem Begin and Ariel Sharon among others. Its 1977 election victory ended three decades of Labor dominance. The party's ideological roots trace to Revisionist Zionism, which rejected territorial compromise and claimed sovereignty over all of historic Palestine and Transjordan.</span></span> party's 1977 platform referenced the whole Land of Israel. Netanyahu's coalition governments from 2009 onward included ultranationalists openly advocating annexation. Finance Minister <span class="gh">Smotrich<span class="gh-t">Bezalel Smotrich, leader of the Religious Zionist Party and Israel's Finance Minister since 2022. Has described himself as a "fascist homophobe." In March 2023, he displayed a map at a Paris conference showing Jordan as part of Israel. He advocates full Israeli sovereignty over the West Bank.</span></span> posted a map of "Greater Israel" including Jordan. National Security Minister <span class="gh">Ben Gvir<span class="gh-t">Itamar Ben Gvir, leader of the far-right Otzma Yehudit ("Jewish Power") party. Convicted in 2007 of supporting the Kach movement, designated a terrorist organization by both Israel and the United States. As National Security Minister, he has visited the Temple Mount / Haram al-Sharif in provocative displays of sovereignty.</span></span> has been convicted of supporting a terrorist organization.</p>
-    <p>Meanwhile: Iraq was invaded and splintered. Syria collapsed. Libya fractured. The map Yinon sketched — fragmented Arab states surrounding an expanding Israel — looks more like the present Middle East with each passing year.</p>
-    <p>Coincidence? Or blueprint? Hold that question. Let me show you more.</p>
+    <p>Now look at the map since 1982 — not through Israeli eyes, but through the crosshairs.</p>
+    <p>Iraq. The United States invaded in 2003 on the premise of weapons that did not exist. The architects of that war — <span class="gh">Wolfowitz<span class="gh-t">Paul Wolfowitz, Deputy Secretary of Defense (2001–2005). A leading neoconservative intellectual and primary architect of the Iraq invasion. Co-authored the 1992 Defense Planning Guidance calling for American global military dominance. The 2003 invasion's intellectual framework was laid in the 1996 "Clean Break" paper, written for Netanyahu by American policy advisors.</span></span>, <span class="gh">Perle<span class="gh-t">Richard Perle, chairman of the Defense Policy Board (2001–2003). Known as the "Prince of Darkness." Co-author of the 1996 "A Clean Break: A New Strategy for Securing the Realm," written for incoming Israeli PM Netanyahu, which recommended abandoning the Oslo Accords, removing Saddam Hussein, and reshaping the Middle East. Three of its recommendations became US foreign policy within seven years.</span></span>, <span class="gh">Feith<span class="gh-t">Douglas Feith, Under Secretary of Defense for Policy (2001–2005). Ran the Office of Special Plans, which produced intelligence assessments on Iraq that contradicted the CIA's findings. General Tommy Franks reportedly called him "the dumbest fucking guy on the planet." His office was investigated for passing classified information to Israel.</span></span> — had co-authored a 1996 paper called <em>"A Clean Break"</em> for incoming Israeli Prime Minister Netanyahu. The paper recommended removing Saddam Hussein. Seven years later, the United States did it for them. Iraq splintered into Sunni, Shia, and Kurdish territories — exactly as Yinon had sketched.</p>
+    <p>Syria. Civil war erupted in 2011. The country fragmented along the sectarian lines Yinon identified three decades earlier. The United States armed rebels. Russia intervened. By 2020, Syria existed on no map in any meaningful sense.</p>
+    <p>Libya. NATO — led by the United States — bombed Gaddafi's government in 2011. The state collapsed. It remains a failed state, run by competing militias, open-air slave markets operating where a government once stood.</p>
+    <p>In each case, the United States was the hammer. American troops. American bombs. American taxpayers. And in each case, the result matched a map drawn by an Israeli strategist in a journal no one read. The conspiracy asks: <em>whose hand held the hammer? And who drew the blueprint it was swinging at?</em></p>
+    <p>Hold that question. Let me show you more.</p>
   </div>
 
   <div class="nt rv"><p>The facts are accumulating. You can feel the thread forming.<br>Let it form. We'll examine it together — in a moment.</p></div>
@@ -471,6 +490,37 @@ body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:u
     <div class="ev-card spec" data-ev="11"><div class="ev-num">EXHIBIT F — THE THREAD</div><div class="ev-class alleged">SPECULATIVE CONSTRUCTION</div><div class="ev-body">The conspiracy version assembles these exhibits into one narrative: Rothschild financing → Balfour Declaration → the state of Israel → AIPAC's capture of Congress → intelligence operations → Epstein's blackmail network → leverage over Clinton <em>and</em> Trump → American foreign policy bent permanently toward Israeli interests → settlement expansion → Greater Israel from the Nile to the Euphrates → the destruction of Iraq, Syria, Libya → <strong>and now: the bombing of Iran.</strong></div></div>
 
     <div class="ev-narr" data-ev="12">One thread. A German ghetto in 1744 to American bombs falling on Tehran in 2026. Every node is real. Every node is documented. And the thread between them is the most dangerous story on earth — because it is close enough to the truth to swallow you whole.</div>
+  </div>
+
+  <!-- TYPEWRITER CONSPIRACY BUILDUP -->
+  <div class="tw-wrap rv" id="tw-seq">
+    <div class="tw-line" data-tw="0">So here is what happened.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="1">A family in a ghetto became a bank.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="2">The bank became a network.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="3">The network financed an empire.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="4">The empire wrote a letter.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="5">The letter promised a homeland.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="6">The homeland became a state.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="7">The state built an intelligence service.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="8">The intelligence service built a blackmail network.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="9">The blackmail network captured the Congress.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="10">The Congress funded the wars.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="11">The wars broke the map.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="12">The map matched the blueprint.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="13">The blueprint was written in 1982.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="14">The blueprint was drawn in 1917.<span class="caret"></span></div>
+    <div class="tw-line" data-tw="15">The blueprint was carved into the wall of a ghetto in 14—<span class="caret"></span></div>
+  </div>
+
+  <div class="tw-halt" id="tw-halt">
+    <span class="halt-word">STOP.</span>
+    <p>Read what just happened to your heartbeat.<br>
+    Read what just happened to your certainty.<br>
+    You felt the thread tighten. You felt the pattern close.<br>
+    You were <em>sure</em> you were about to see the whole picture.</p>
+    <p>That feeling — that dark, electric certainty —<br>
+    is not understanding. It is the conspiracy <em>working on you</em>.</p>
+    <span class="halt-breath">Take a breath before you continue.</span>
   </div>
 
   <div class="dv rv">· · · ◆ · · ·</div>
@@ -638,6 +688,26 @@ if(vtl){const vtlO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersect
 /* Detective file cards — animate in sequence, unobserve after to prevent re-trigger */
 const evS=document.getElementById('ev-stack');
 if(evS){const evO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){evS.querySelectorAll('.ev-card,.ev-narr').forEach((el,i)=>{setTimeout(()=>el.classList.add('show'),i*800)});evO.unobserve(e.target)}})},{threshold:0.1});evO.observe(evS)}
+
+/* Typewriter conspiracy sequence — lines appear one by one, then halt */
+const twSeq=document.getElementById('tw-seq');
+const twHalt=document.getElementById('tw-halt');
+if(twSeq){const twO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){
+  const lines=twSeq.querySelectorAll('.tw-line');
+  const delay=700;
+  lines.forEach((ln,i)=>{
+    setTimeout(()=>{
+      /* kill previous caret */
+      if(i>0)lines[i-1].classList.add('dead');
+      ln.classList.add('on');
+      /* last line: pause, then halt */
+      if(i===lines.length-1){
+        setTimeout(()=>{ln.classList.add('dead');if(twHalt)twHalt.classList.add('on')},1800);
+      }
+    },i*delay);
+  });
+  twO.unobserve(e.target);
+}})},{threshold:0.15});twO.observe(twSeq)}
 
 function initMaps(){
   try{
