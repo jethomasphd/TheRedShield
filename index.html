@@ -219,7 +219,9 @@ body::after{content:'';position:fixed;top:0;right:0;bottom:0;left:0;background:u
 .gh .gh-t{visibility:hidden;opacity:0;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);width:280px;padding:12px 14px;background:var(--frag);border:1px solid var(--iron);font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ash);line-height:1.6;letter-spacing:0.5px;text-align:left;text-transform:none;font-style:normal;font-weight:normal;z-index:100;pointer-events:none;transition:opacity .3s;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
 .gh .gh-t::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--iron)}
 .gh:hover .gh-t,.gh:focus .gh-t,.gh.active .gh-t{visibility:visible;opacity:1;pointer-events:auto}
-@media(max-width:768px){.gh .gh-t{position:fixed;left:16px;right:16px;bottom:60px;top:auto;width:auto;transform:none}.gh .gh-t::after{display:none}}
+/* Mobile: keep absolute positioning near the word, just shrink width */
+@media(max-width:768px){.gh .gh-t{width:260px;max-width:80vw;left:0;transform:none}
+.gh .gh-t.flip{bottom:auto;top:calc(100% + 8px)}.gh .gh-t.flip::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--iron)}}
 .gh-hint{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--ink-g);letter-spacing:2px;text-align:center;margin:10px 0 30px;opacity:0;transition:opacity 1.5s}
 .gh-hint.vis{opacity:1}
 .gh-hint span{border-bottom:1px dotted var(--ink-g);color:var(--ink-f)}
@@ -666,11 +668,54 @@ document.getElementById('seal-btn').addEventListener('click',function(){
 const rO=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');rO.unobserve(e.target)}})},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.rv').forEach(el=>rO.observe(el));
 
-/* Touch-friendly tooltips — tap to toggle, tap elsewhere to dismiss */
+/* Touch-friendly tooltips — tap to toggle, tap elsewhere to dismiss, reposition on mobile */
 document.addEventListener('click',function(e){
   const gh=e.target.closest('.gh');
-  document.querySelectorAll('.gh.active').forEach(function(el){if(el!==gh)el.classList.remove('active')});
-  if(gh){e.preventDefault();gh.classList.toggle('active')}
+  document.querySelectorAll('.gh.active').forEach(function(el){if(el!==gh){el.classList.remove('active');var t=el.querySelector('.gh-t');if(t){t.classList.remove('flip');t.style.cssText=''}}});
+  if(gh){
+    e.preventDefault();
+    var wasActive=gh.classList.contains('active');
+    gh.classList.toggle('active');
+    if(wasActive){var dt=gh.querySelector('.gh-t');if(dt){dt.classList.remove('flip');dt.style.cssText=''}return}
+    if(gh.classList.contains('active')){
+      var tip=gh.querySelector('.gh-t');
+      if(tip){
+        /* reset */
+        tip.classList.remove('flip');tip.style.left='';tip.style.right='';
+        /* measure after paint */
+        requestAnimationFrame(function(){
+          var gr=gh.getBoundingClientRect();
+          var tr=tip.getBoundingClientRect();
+          /* flip below if tooltip goes above viewport */
+          if(tr.top<8){tip.classList.add('flip')}
+          /* nudge horizontally if overflowing right */
+          if(tr.right>window.innerWidth-8){
+            tip.style.left='auto';
+            tip.style.right='-8px';
+            tip.style.transform='none';
+          }
+          /* nudge if overflowing left */
+          var tr2=tip.getBoundingClientRect();
+          if(tr2.left<8){
+            tip.style.left='0';tip.style.right='auto';
+            tip.style.transform='none';
+            /* on very narrow screens, anchor to viewport */
+            var tr3=tip.getBoundingClientRect();
+            if(tr3.left<0){
+              tip.style.position='fixed';
+              tip.style.left='8px';tip.style.right='8px';
+              tip.style.width='auto';
+              tip.style.bottom=(window.innerHeight-gr.top+8)+'px';
+              if(tip.classList.contains('flip')){
+                tip.style.bottom='auto';
+                tip.style.top=(gr.bottom+8)+'px';
+              }
+            }
+          }
+        });
+      }
+    }
+  }
 });
 
 /* Progress bar */
